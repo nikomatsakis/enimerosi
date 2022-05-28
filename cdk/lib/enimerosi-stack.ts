@@ -21,6 +21,10 @@ export class EnimerosiStack extends Stack {
     const fn = new NodejsFunction(this, 'ProcessEmail', {
       runtime: lambda.Runtime.NODEJS_16_X,
       handler: 'main',
+      environment: {
+        region: Stack.of(this).region,
+        emailsBucket: emailsBucket.bucketArn,
+      },
       entry: path.join(__dirname, `/../process-email-lambda/index.ts`),
       bundling: {
         minify: true,
