@@ -5,6 +5,7 @@ import * as ses from 'aws-cdk-lib/aws-ses';
 import * as ses_actions from 'aws-cdk-lib/aws-ses-actions';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as path from 'path';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 
 export class EnimerosiStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -12,10 +13,14 @@ export class EnimerosiStack extends Stack {
 
     const bucket = new s3.Bucket(this, 'Bucket');
 
-    const fn = new lambda.Function(this, 'ProcessEmail', {
+    const fn = new NodejsFunction(this, 'ProcessEmail', {
       runtime: lambda.Runtime.NODEJS_16_X,
-      handler: 'index.handler',
-      code: lambda.Code.fromAsset(path.join(__dirname, '../../process-email-lambda')),
+      handler: 'main',
+      entry: path.join(__dirname, `/../process-email-lambda/index.ts`),
+      bundling: {
+        minify: true,
+        externalModules: ['aws-sdk'],
+      },
       tracing: lambda.Tracing.ACTIVE,
     });
 
