@@ -23,7 +23,7 @@ export class EnimerosiStack extends Stack {
       handler: 'main',
       environment: {
         region: Stack.of(this).region,
-        emailsBucket: emailsBucket.bucketArn,
+        emailsBucket: emailsBucket.bucketName,
       },
       entry: path.join(__dirname, `/../process-email-lambda/index.ts`),
       bundling: {
@@ -47,7 +47,7 @@ export class EnimerosiStack extends Stack {
           actions: [
             new ses_actions.S3({
               bucket: emailsBucket,
-              objectKeyPrefix: 'emails/',
+              objectKeyPrefix: '',
               // topic: emailsTopic,
             }),
             new ses_actions.Lambda({

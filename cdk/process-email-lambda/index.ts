@@ -15,15 +15,17 @@ export async function main(event: SESEvent, context: Context): Promise<any> {
     });
 
     for (let record of event.Records) {
-        console.log(`Email received from '${record.ses.mail.source}' with subject '${record.ses.mail.commonHeaders.subject}'`);
         let messageId = record.ses.mail.messageId;
-        let params = { Bucket: emailsBucket, Key: messageId };
-        console.log(`Params = ${JSON.stringify(params)}`);
-        let messageContents = await s3.getObject(params).promise();
-        console.log(`Body has ${messageContents.Body!.toString().length} bytes`);
-        let body = messageContents.Body!.toString();
-        let parsedMail = await simpleParser(body);
-        console.log(`Parsed Mail: ${JSON.stringify(parsedMail)}`);
+        console.log(`Email ${messageId} received from '${record.ses.mail.source}' with subject '${record.ses.mail.commonHeaders.subject}'`);
+        try {
+            let messageContents = await s3.getObject({ Bucket: emailsBucket, Key: messageId }).promise();
+            console.log(`Body has ${messageContents.Body!.toString().length} bytes`);
+            let body = messageContents.Body!.toString();
+            let parsedMail = await simpleParser(body);
+            console.log(`Parsed Mail: ${JSON.stringify(parsedMail)}`);
+        } catch (e) {
+            console.log(`Fetching/parsing message encountered an error: ${JSON.stringify(e, null, 2)}`);
+        }
     }
 
     return {};
