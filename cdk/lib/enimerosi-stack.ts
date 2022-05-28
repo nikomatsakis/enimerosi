@@ -28,6 +28,7 @@ export class EnimerosiStack extends Stack {
       },
       tracing: lambda.Tracing.ACTIVE,
     });
+    emailsBucket.grantRead(fn);
     // emailsTopic.addSubscription(new sns_subscriptions.LambdaSubscription(fn));
 
     // NB: Because of https://github.com/aws/aws-cdk/issues/10321,
