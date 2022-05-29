@@ -13,8 +13,8 @@ export class EnimerosiStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
+    // This bucket stores the full text of every email.
     const emailsBucket = new s3.Bucket(this, 'EmailsBucket');
-    // const emailsTopic = new sns.Topic(this, 'EmailsTopic');
 
     // Each message that is delivered will be stored into S3 and then
     // a notification is sent to `emailsTopic`. This lambda is subscribed.
@@ -33,8 +33,10 @@ export class EnimerosiStack extends Stack {
       tracing: lambda.Tracing.ACTIVE,
     });
     emailsBucket.grantRead(fn);
-    // emailsTopic.addSubscription(new sns_subscriptions.LambdaSubscription(fn));
 
+    // Simple Email Service that receives notifications from github,
+    // stores them in S3, and then invokes the lambda above.
+    //
     // NB: Because of https://github.com/aws/aws-cdk/issues/10321,
     // you must manually set the rule to active. I am not smart
     // enough to figure out how to use an [AwsCustomResource],
@@ -48,7 +50,6 @@ export class EnimerosiStack extends Stack {
             new ses_actions.S3({
               bucket: emailsBucket,
               objectKeyPrefix: '',
-              // topic: emailsTopic,
             }),
             new ses_actions.Lambda({
               function: fn,
