@@ -1,0 +1,304 @@
+Return-Path: <niko@alum.mit.edu>
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+	 by sloti48n36 (Cyrus 3.7.0-alpha0-591-gfe6c3a2700-fm-20220427.001-gfe6c3a27) with LMTPA;
+	 Sun, 29 May 2022 18:29:09 -0400
+X-Cyrus-Session-Id: sloti48n36-1653863349-3346579-2-4349348934801897572
+X-Sieve: CMU Sieve 3.0
+X-Spam-known-sender: yes ("Address notifications@github.com in From header is in
+ addressbook"); in-addressbook
+X-Spam-sender-reputation: 0 (email)
+X-Spam-score: 0.0
+X-Spam-hits: BAYES_50 0.8, HEADER_FROM_DIFFERENT_DOMAINS 0.248,
+  HTML_IMAGE_ONLY_20 1.546, HTML_MESSAGE 0.001, MAILING_LIST_MULTI -1,
+  ME_DMARC_IN_FMWL -0.001, ME_HAS_VSSU 0.001, ME_SC_NH -0.001,
+  ME_SENDERREP_DENY 4, RCVD_IN_DNSWL_NONE -0.0001,
+  RCVD_IN_MSPIKE_H2 -0.001, SPF_HELO_PASS -0.001, SPF_PASS -0.001,
+  T_KAM_HTML_FONT_INVALID 0.01, T_SCC_BODY_TEXT_LINE -0.01, LANGUAGES en,
+  BAYES_USED user, SA_VERSION 3.4.6
+X-Spam-source: IP='40.107.223.80',
+  Host='mail-dm6nam11on2080.outbound.protection.outlook.com', Country='US',
+  FromHeader='com', MailFrom='edu'
+X-Spam-charsets: plain='UTF-8', html='UTF-8'
+X-Resolved-to: nikomatsakis@fastmail.fm
+X-Delivered-to: nikomatsakis@fastmail.fm
+X-Original-Delivered-to: niko@alum.mit.edu
+X-Mail-from: niko@alum.mit.edu
+Received: from mx1 ([10.202.2.200])
+  by compute2.internal (LMTPProxy); Sun, 29 May 2022 18:29:09 -0400
+Received: from mx1.messagingengine.com (localhost [127.0.0.1])
+	by mailmx.nyi.internal (Postfix) with ESMTP id C647523C0131
+	for <nikomatsakis@fastmail.fm>; Sun, 29 May 2022 18:29:08 -0400 (EDT)
+Received: from mx1.messagingengine.com (localhost [127.0.0.1])
+    by mx1.messagingengine.com (Authentication Milter) with ESMTP
+    id A83E88A8178;
+    Sun, 29 May 2022 18:29:08 -0400
+ARC-Seal: i=2; a=rsa-sha256; cv=pass; d=messagingengine.com; s=fm1; t=
+    1653863348; b=Yk0HjM1mv+jncWInFE4zzS5fAVq9qJf+tQld6gmnJ7N8k41bF3
+    wbJ1BbMkU7sh8pCtL3hDVx0RjLnUR68Vr+JzxFA8rFgiTyKMSLgG16SOOsoqd179
+    /QXbd7ker4opzmqRFk6/qQln+yp2qIy7OoBHCjB+idkES1+fiabtZ2sTcvkYib4+
+    Gyk4TAwDeIGzXwPJ4WuwS86JovxBOF1VESmM23a0YTbymvlaptbS3U3vhYbAl1Un
+    wy8h7+dsz0bnrGkU7t5VOF9j+L6xWwcWQnH8rWfgzbGG6JnmP6k/t8KR4YVJdaRk
+    l3042UBEqwImYOnBwoSvHSm4+ci/zJ2P9yGg==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=
+    messagingengine.com; h=resent-from:date:from:reply-to:to:cc
+    :message-id:in-reply-to:references:subject:mime-version
+    :content-type:content-transfer-encoding:list-id:list-archive
+    :list-post:list-unsubscribe; s=fm1; t=1653863348; bh=/wFHrzqFB+R
+    3hTM5zureZz6eYWa+sOaY5w3GRB2+hUU=; b=kMdV0Tv/0lYEZc9CYu0pCcHKR0E
+    EbXy65v6umP/pQzn4ZvsknwQLkG4x/Xu2umTRSIhFYcc4bowmiRJoP7l9ZxjGS5j
+    PqffeNSgmpZevBYIbjBDAWABjGEIqjPi9YKEWww30x+4PcuIb9Y8VrQbr+f6Y5Em
+    jjb0wLyd4gREjJhLE8+Qledsp5s+dZj6y5fAzv9GmbOQAVUCfgaTphdUym8sSjr1
+    Qa2fGfqxX/x1D1R2FnpfN2iGiEbO9Czbr9WVf5cxxaVxxBUp96fYBVbubAaXT8A+
+    k0n1WJ+mgY/ligpnaL6RqUQUAoT5ZNfLuPt6fp2+HhgcW7EGEuW9CTItZIA==
+ARC-Authentication-Results: i=2; mx1.messagingengine.com;
+    x-csa=none;
+    x-me-sender=none;
+    x-ptr=fail smtp.helo=NAM11-DM6-obe.outbound.protection.outlook.com
+    policy.ptr=mail-dm6nam11on2080.outbound.protection.outlook.com;
+    bimi=none (No BIMI records found);
+    arc=pass (as.1.microsoft.com=pass, ams.1.microsoft.com=pass)
+    smtp.remote-ip=40.107.223.80;
+    x-arc-dkim=pass (signature was verified) header.d=github.com
+    x-arc-instance=1 x-arc-domain=microsoft.com
+    (Trusted from aar.1.microsoft.com);
+    x-arc-spf=pass (sender ip is   192.30.252.205)
+    smtp.rcpttodomain=alum.mit.edu smtp.mailfrom=github.com
+    x-arc-instance=1 x-arc-domain=microsoft.com
+    (Trusted from aar.1.microsoft.com);
+    dkim=pass (1024-bit rsa key sha256) header.d=github.com
+    header.i=@github.com header.b=brzgQK6Z header.a=rsa-sha256
+    header.s=pf2014 x-bits=1024;
+    dkim=pass (1024-bit rsa key sha256) header.d=mitalumprod.onmicrosoft.com
+    header.i=@mitalumprod.onmicrosoft.com header.b=JSLwzRCH
+    header.a=rsa-sha256 header.s=selector2-mitalumprod-onmicrosoft-com
+    x-bits=1024;
+    dmarc=pass policy.dwl=pass policy.published-domain-policy=reject
+    policy.applied-disposition=none policy.evaluated-disposition=none
+    (p=reject,has-list-id=yes,d=none,d.eval=none) policy.policy-from=p
+    header.from=github.com;
+    iprev=pass smtp.remote-ip=40.107.223.80
+    (mail-dm6nam11on2080.outbound.protection.outlook.com);
+    spf=pass smtp.mailfrom=niko@alum.mit.edu
+    smtp.helo=NAM11-DM6-obe.outbound.protection.outlook.com
+X-ME-Authentication-Results: mx1.messagingengine.com;
+    x-aligned-from=fail;
+    x-return-mx=pass header.domain=github.com policy.is_org=yes
+      (MX Records found: alt2.aspmx.l.google.com,alt3.aspmx.l.google.com,alt4.aspmx.l.google.com,aspmx.l.google.com,alt1.aspmx.l.google.com);
+    x-return-mx=pass smtp.domain=alum.mit.edu policy.org_domain=mit.edu
+      policy.is_org=no
+      (MX Records found: alum-mit-edu.mail.protection.outlook.com);
+    x-tls=pass smtp.version=TLSv1.2 smtp.cipher=ECDHE-RSA-AES256-GCM-SHA384
+      smtp.bits=256/256;
+    x-vs=clean score=-80 state=0
+Authentication-Results: mx1.messagingengine.com;
+    x-csa=none;
+    x-me-sender=none;
+    x-ptr=fail smtp.helo=NAM11-DM6-obe.outbound.protection.outlook.com
+      policy.ptr=mail-dm6nam11on2080.outbound.protection.outlook.com
+Authentication-Results: mx1.messagingengine.com;
+    bimi=none (No BIMI records found)
+Authentication-Results: mx1.messagingengine.com;
+    arc=pass (as.1.microsoft.com=pass, ams.1.microsoft.com=pass)
+      smtp.remote-ip=40.107.223.80;
+    x-arc-dkim=pass (signature was verified) header.d=github.com
+      x-arc-instance=1 x-arc-domain=microsoft.com
+      (Trusted from aar.1.microsoft.com);
+    x-arc-spf=pass (sender ip is   192.30.252.205)
+      smtp.rcpttodomain=alum.mit.edu smtp.mailfrom=github.com
+      x-arc-instance=1 x-arc-domain=microsoft.com
+      (Trusted from aar.1.microsoft.com)
+Authentication-Results: mx1.messagingengine.com;
+    dkim=pass (1024-bit rsa key sha256) header.d=github.com
+      header.i=@github.com header.b=brzgQK6Z header.a=rsa-sha256
+      header.s=pf2014 x-bits=1024;
+    dkim=pass (1024-bit rsa key sha256) header.d=mitalumprod.onmicrosoft.com
+      header.i=@mitalumprod.onmicrosoft.com header.b=JSLwzRCH
+      header.a=rsa-sha256 header.s=selector2-mitalumprod-onmicrosoft-com
+      x-bits=1024;
+    dmarc=pass policy.dwl=pass policy.published-domain-policy=reject
+      policy.applied-disposition=none policy.evaluated-disposition=none
+      (p=reject,has-list-id=yes,d=none,d.eval=none) policy.policy-from=p
+      header.from=github.com;
+    iprev=pass smtp.remote-ip=40.107.223.80
+      (mail-dm6nam11on2080.outbound.protection.outlook.com);
+    spf=pass smtp.mailfrom=niko@alum.mit.edu
+      smtp.helo=NAM11-DM6-obe.outbound.protection.outlook.com
+X-ME-VSSU: VW5zdWI9aHR0cHM6Ly9naXRodWIuY29tL25vdGlmaWNhdGlvbnMvdW5zdWJzY3JpYmUtYX
+    V0aC9BQUJGNFpUMkZYSVg2S1dJTjNMVjVSTFZNUFZUREFOQ05GU001UzVHS0hJQQ
+X-ME-VSSU: VW5zdWI9aHR0cHM6Ly9naXRodWIuY29tL25vdGlmaWNhdGlvbnMvdW5zdWJzY3JpYmUvQU
+    FCRjRaVk9VVUo2UUtXWURMMk9TTFRWTVBWVERBTkNORlNNNVM1R0tISUE
+X-ME-VSSU: VW5zdWI9bWFpbHRvOnVuc3ViK0FBQkY0WlJOVkJCUFdONlc3Q1FXSkVPQVVFVERERVZCTk
+    hIRU9ZT0FaSUByZXBseS5naXRodWIuY29t
+X-ME-VSCause: gggruggvucftvghtrhhoucdtuddrgedvfedrkeehgddtlecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenhdfknhhvihhsihgslhgvucifohhrughsucdlvddtmdenucfjughr
+    peffhfhrvfevkfgjfhfugggtgfhpjeegudfjsegrjeerredttdejnecuhfhrohhmpeggrg
+    guihhmucfrvghtrhhotghhvghnkhhovhcuoehnohhtihhfihgtrghtihhonhhssehgihht
+    hhhusgdrtghomheqnecuggftrfgrthhtvghrnhepfeekuefggfffvdduvdeugeeklefgie
+    effffffeduvdehhedufeevgfefffejkeeunecuffhomhgrihhnpehgihhthhhusgdrtgho
+    mhenucfkphepgedtrddutdejrddvvdefrdektddpudelvddrfedtrddvhedvrddvtdehne
+    cuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepgedtrddutdejrddv
+    vdefrdektddphhgvlhhopefptefoudduqdffofeiqdhosggvrdhouhhtsghouhhnugdrph
+    hrohhtvggtthhiohhnrdhouhhtlhhoohhkrdgtohhmpdhmrghilhhfrhhomhepoehnihhk
+    ohesrghluhhmrdhmihhtrdgvughuqe
+X-ME-VSScore: -80
+X-ME-VSCategory: clean
+X-ME-CSA: none
+Received-SPF: pass
+    (alum.mit.edu: Sender is authorized to use 'niko@alum.mit.edu' in 'mfrom' identity (mechanism 'include:spf.protection.outlook.com' matched))
+    receiver=mx1.messagingengine.com;
+    identity=mailfrom;
+    envelope-from="niko@alum.mit.edu";
+    helo=NAM11-DM6-obe.outbound.protection.outlook.com;
+    client-ip=40.107.223.80
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2080.outbound.protection.outlook.com [40.107.223.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.messagingengine.com (Postfix) with ESMTPS
+	for <nikomatsakis@fastmail.fm>; Sun, 29 May 2022 18:29:08 -0400 (EDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Nc48UhGPPuj48y+xw75iP+fP5gIXrg2KOKQT+r0v0NV4XrJWAn647Ob1M/GkSMofnnVR7EbTfuaytyVKeaU4E88WjQ9Lx+9qfnDt/z9EN3egbbh0MzQuX9AI1A2cMmZSPBUXZBbxfF/towRTxGp9BJI0KoOQN7KBWyMjwTiF3U1aHImhKCO5ZpkHCMW82nzhamifNuV11NVXNuGhnXz7ZVcmRzFtH/SsOt0U5gNt0B3bL3+zRJDEms+NT3pbJoVgS0lHgGWXll28o0LrHeLY4pajBTsLBGfBm3I+K/NuG78WAP1TIyJX1sDSTvOI7DcVvIuYSi8GN0QqnD6tHA/ZLA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/wFHrzqFB+R3hTM5zureZz6eYWa+sOaY5w3GRB2+hUU=;
+ b=JR6+3SMFlrHzsUnjXcsnVR7Yy54dSfJfBnH53YkTLrR+QB8BOtAjokuavs74Nk6OfsXB6dlP2omQKFfI5h9tXzhC+86hospdPOiHctTw3wUGNd1DPbJpKkyGFhsk8OjURwSO1JrikEPme1BeZo98t6XEaRagdZbv+kG79v/13OnxGl4t54NzjcphFFJe7LR1vuu//TnKGo+hJpHxqeKpIU/PkzkXZbbOTFQmFmONhwXkvwOSMF6epHSmyL+H9YqpwzvzHV6UBUxbzK03/TqLPzwBVWqSpq58UFgjtmv5bNUHGSOCVN96L2/ZNla6MqpMliNlFMSi6OBQN4tZRgKz/g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 192.30.252.205) smtp.rcpttodomain=alum.mit.edu smtp.mailfrom=github.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=github.com;
+ dkim=pass (signature was verified) header.d=github.com; arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mitalumprod.onmicrosoft.com; s=selector2-mitalumprod-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/wFHrzqFB+R3hTM5zureZz6eYWa+sOaY5w3GRB2+hUU=;
+ b=JSLwzRCHDdNObGPbT7NxLWSmCXpBh+egBzDqNBw4s0KRaJ0AgMUixQDkIjsl5da0v1psXPaYt7oAoc8p2WmY04eEzGBgieJsGZppMFgsjLdItieLTIcpNXFeV1lPbgdmaXZ52papYu9FtbPy7kzvP4dV8q3JDru676iZuzYt7rY=
+Resent-From: <niko@alum.mit.edu>
+Received: from DS7PR05CA0061.namprd05.prod.outlook.com (2603:10b6:8:57::15) by
+ DM5PR12MB1564.namprd12.prod.outlook.com (2603:10b6:4:f::21) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5293.13; Sun, 29 May 2022 22:29:06 +0000
+Received: from DM3NAM02FT044.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:8:57:cafe::a5) by DS7PR05CA0061.outlook.office365.com
+ (2603:10b6:8:57::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5314.6 via Frontend
+ Transport; Sun, 29 May 2022 22:29:06 +0000
+Received-SPF: Pass (protection.outlook.com: domain of github.com designates
+ 192.30.252.205 as permitted sender) receiver=protection.outlook.com;
+ client-ip=192.30.252.205; helo=smtp.github.com; pr=C
+Received: from smtp.github.com (192.30.252.205) by
+ DM3NAM02FT044.mail.protection.outlook.com (10.13.5.98) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5293.13 via Frontend Transport; Sun, 29 May 2022 22:29:05 +0000
+Received: from github-lowworker-4acbd10.va3-iad.github.net (github-lowworker-4acbd10.va3-iad.github.net [10.48.112.93])
+	by smtp.github.com (Postfix) with ESMTP id 7C766720B9E
+	for <niko@alum.mit.edu>; Sun, 29 May 2022 15:29:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2014; t=1653863345;
+	bh=/wFHrzqFB+R3hTM5zureZz6eYWa+sOaY5w3GRB2+hUU=;
+	h=Date:From:Reply-To:To:Cc:In-Reply-To:References:Subject:List-ID:
+	 List-Archive:List-Post:List-Unsubscribe:From;
+	b=brzgQK6ZWUvLj9RhGV+8u8B2sTHrETc8f8xo4gY0ADTyTVy/L4Hp24Knth5M542Y7
+	 cQc5QxTltsWy5OUZEuxb6GeKwFxDUURGGTZ0dNjLO9fYVSL6B6iq1PXRSpaUbmnjNX
+	 rV/YdCpZGudKpATxy76PBZUGm8Ocw7Rx7potKEss=
+Date: Sun, 29 May 2022 15:29:05 -0700
+From: Vadim Petrochenkov <notifications@github.com>
+Reply-To: rust-lang/rust <reply+AABF4ZRNVBBPWN6W7CQWJEOAUETDDEVBNHHEOYOAZI@reply.github.com>
+To: rust-lang/rust <rust@noreply.github.com>
+Cc: Niko Matsakis <niko@alum.mit.edu>, 
+ Mention <mention@noreply.github.com>
+Message-ID: <rust-lang/rust/pull/95818/c1140536458@github.com>
+In-Reply-To: <rust-lang/rust/pull/95818@github.com>
+References: <rust-lang/rust/pull/95818@github.com>
+Subject: Re: [rust-lang/rust] Stabilize the `bundle` native library modifier
+ (PR #95818)
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_6293f3b16d28e_a12d6d8797447";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Precedence: list
+X-GitHub-Sender: petrochenkov
+X-GitHub-Recipient: nikomatsakis
+X-GitHub-Reason: mention
+List-ID: rust-lang/rust <rust.rust-lang.github.com>
+List-Archive: https://github.com/rust-lang/rust
+List-Post: <mailto:reply+AABF4ZRNVBBPWN6W7CQWJEOAUETDDEVBNHHEOYOAZI@reply.github.com>
+List-Unsubscribe: <mailto:unsub+AABF4ZRNVBBPWN6W7CQWJEOAUETDDEVBNHHEOYOAZI@reply.github.com>,
+ <https://github.com/notifications/unsubscribe/AABF4ZVOUUJ6QKWYDL2OSLTVMPVTDANCNFSM5S5GKHIA>
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-GitHub-Recipient-Address: niko@alum.mit.edu
+X-EOPAttributedMessage: 0
+X-EOPTenantAttributedMessage: 3326b102-c043-408b-a990-b89e477d582f:0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: bc74c899-0083-4eb1-a50f-08da41c2a429
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1564:EE_
+X-LD-Processed: 3326b102-c043-408b-a990-b89e477d582f,ExtAddr,ExtFwd
+X-Microsoft-Antispam-PRVS:
+	<DM5PR12MB15641BD49DA6838987C96AEDC3DA9@DM5PR12MB1564.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 0
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Moj/TWOQg/CwMUvbN7R8UBwOMsulI7scvksNDiLBxoV34/C1Qe/IHh3V5BQJo9OUEB/ZWYQNwGUiEXOL+aKUokQBdo5OygmMI68lnouQYAF0/rIeKzBTtabhPoOc7VyugFr+ArTElLICroC3nVX2n14IfdKuK9Ej8pZnOs36eHDdrfzvAOQR90jhUlGAN+H3k2vg93TWnSRvaWc6G+5ncbuDC53bFJjlXss7Hq/qRUVA7IjITB9RCwn3zObiqpqwvmTvYME4A23c5ofJGpI6T1KSEqAdo35BxBD0kKMaL1sKaIguyGBAUSfVxp4KIjnmTTYsD6W8gDG6Le5lqUHj8LdokAoTheWpPWTOPQu3GzhvXiPv6UxNrNkNhBay3hVrkI012wH8VO4fVqT0LA+oZkHhjf83T1J/fN/4fzi8Q7oo3/l3FpcMu1fiNljApFqWvNKdQd2lDga1sDrNWJ99xn7wrRN/qXeJgkSqbgaDjqeFKgpDHzDE3NXic685j3rqZwYElKrHPAkW//rf9vkiBAUa1vll9OxPB/4dbkDXqqx9hCxFKHl+Jp6jysgXvpp3i3p09OddA6NUJjBtwtdfJqLkv7KCNuQcjlGoKXYz6MwSXQT5BPQT3+kUjo8cZX+VJXrvKNQYoxZx70xG2sTP/XwrkimLz1cO18GNiq3wr8lE3L74G0s9dfw7BAWkc3W3TiJnHYvVBnAh1QAcenlHm9I/pY2iBRYYx4fqYoP9FL2qzT8ZNB5xqJDgNYtY70FLRpupTYgnY83XqFelEXcs8eMyFYuAKjj4Ew9qlhaxUIRStQ/NdDkZ2hT1+9GqUtDI
+X-Forefront-Antispam-Report:
+	CIP:192.30.252.205;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:smtp.github.com;PTR:out-22.smtp.github.com;CAT:NONE;SFS:(13230001)(426003)(336012)(121820200001)(356005)(316002)(786003)(107886003)(76236003)(54906003)(36756003)(966005)(19627405001)(166002)(19810500001)(7636003)(2906002)(33964004)(6266002)(26005)(2616005)(68406010)(6862004)(70586007)(8676002)(4326008)(5660300002)(83380400001)(508600001)(81973001)(43580500001);DIR:OUT;SFP:1101;
+X-ExternalRecipientOutboundConnectors: 3326b102-c043-408b-a990-b89e477d582f
+X-OriginatorOrg: alum.mit.edu
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2022 22:29:05.8906
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: bc74c899-0083-4eb1-a50f-08da41c2a429
+X-MS-Exchange-CrossTenant-Id: 3326b102-c043-408b-a990-b89e477d582f
+X-MS-Exchange-CrossTenant-AuthSource: DM3NAM02FT044.eop-nam02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: Internet
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1564
+X-Received-Authentication-Results: (Received Authentication-Results header removed by mx1.messagingengine.com)
+    spf=pass (sender IP is 192.30.252.205)
+ smtp.mailfrom=github.com; dkim=pass (signature was verified)
+ header.d=github.com;dmarc=pass action=none header.from=github.com;
+
+
+----==_mimepart_6293f3b16d28e_a12d6d8797447
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+r? @wesleywiser 
+@rustbot ready
+
+-- 
+Reply to this email directly or view it on GitHub:
+https://github.com/rust-lang/rust/pull/95818#issuecomment-1140536458
+You are receiving this because you were mentioned.
+
+Message ID: <rust-lang/rust/pull/95818/c1140536458@github.com>
+----==_mimepart_6293f3b16d28e_a12d6d8797447
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<p></p>
+<p dir="auto">r? <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/wesleywiser/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/wesleywiser">@wesleywiser</a><br>
+<a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/rustbot/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/rustbot">@rustbot</a> ready</p>
+
+<p style="font-size:small;-webkit-text-size-adjust:none;color:#666;">&mdash;<br />Reply to this email directly, <a href="https://github.com/rust-lang/rust/pull/95818#issuecomment-1140536458">view it on GitHub</a>, or <a href="https://github.com/notifications/unsubscribe-auth/AABF4ZT2FXIX6KWIN3LV5RLVMPVTDANCNFSM5S5GKHIA">unsubscribe</a>.<br />You are receiving this because you were mentioned.<img src="https://github.com/notifications/beacon/AABF4ZX4BDDG2PYN3LHNGALVMPVTDA5CNFSM5S5GKHIKYY3PNVWWK3TUL52HS4DFVREXG43VMVBW63LNMVXHJKTDN5WW2ZLOORPWSZGOIP5TJCQ.gif" height="1" width="1" alt="" /><span style="color: transparent; font-size: 0; display: none; visibility: hidden; overflow: hidden; opacity: 0; width: 0; height: 0; max-width: 0; max-height: 0; mso-hide: all">Message ID: <span>&lt;rust-lang/rust/pull/95818/c1140536458</span><span>@</span><span>github</span><span>.</span><span>com&gt;</span></span></p>
+<script type="application/ld+json">[
+{
+"@context": "http://schema.org",
+"@type": "EmailMessage",
+"potentialAction": {
+"@type": "ViewAction",
+"target": "https://github.com/rust-lang/rust/pull/95818#issuecomment-1140536458",
+"url": "https://github.com/rust-lang/rust/pull/95818#issuecomment-1140536458",
+"name": "View Pull Request"
+},
+"description": "View this Pull Request on GitHub",
+"publisher": {
+"@type": "Organization",
+"name": "GitHub",
+"url": "https://github.com"
+}
+}
+]</script>
+----==_mimepart_6293f3b16d28e_a12d6d8797447--
