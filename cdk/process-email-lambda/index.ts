@@ -1,24 +1,21 @@
-import { Context, SESEvent } from 'aws-lambda';
+import { Context, S3Event } from 'aws-lambda';
 import { S3 } from 'aws-sdk';
 import { String } from 'aws-sdk/clients/acm';
 import { simpleParser } from 'mailparser';
 
-export async function main(event: SESEvent, context: Context): Promise<any> {
+export async function main(event: S3Event, context: Context): Promise<any> {
     console.log(`Event: ${JSON.stringify(event, null, 2)}`);
     console.log(`Context: ${JSON.stringify(context, null, 2)}`);
     console.log(`Environment: ${JSON.stringify(process.env, null, 2)}`);
 
-    let emailsBucket: string = process.env.emailsBucket!;
-    let region: string = process.env.region!;
-    let s3 = new S3({
-        region
-    });
+    let s3 = new S3({});
 
     for (let record of event.Records) {
-        let messageId = record.ses.mail.messageId;
-        console.log(`Email ${messageId} received from '${record.ses.mail.source}' with subject '${record.ses.mail.commonHeaders.subject}'`);
+        let bucket = record.s3.bucket.name;
+        let messageId = record.s3.object.key;
+        console.log(`Email \`${messageId}\` received from bucket \`${bucket}\``);
         try {
-            let messageContents = await s3.getObject({ Bucket: emailsBucket, Key: messageId }).promise();
+            let messageContents = await s3.getObject({ Bucket: bucket, Key: messageId }).promise();
             console.log(`Body has ${messageContents.Body!.toString().length} bytes`);
             let body = messageContents.Body!.toString();
             let parsedMail = await simpleParser(body);
