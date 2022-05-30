@@ -15,7 +15,7 @@ export class EnimerosiStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    Settings.WORKSPACE_DIR = path.join(__dirname, '/..');
+    // Settings.WORKSPACE_DIR = path.join(__dirname, '/..');
 
     // This bucket stores the full text of every email.
     const emailsBucket = new s3.Bucket(this, 'EmailsBucket');
