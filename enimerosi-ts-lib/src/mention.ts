@@ -36,6 +36,6 @@ export class TeamMention implements Mention {
     }
 
     get name(): string {
-        return `{this.org}/{this.team}`;
+        return `${this.org}/${this.team}`;
     }
 }
