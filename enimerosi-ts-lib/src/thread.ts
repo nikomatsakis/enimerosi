@@ -27,10 +27,10 @@ export class GithubThreadId implements ThreadId {
 type ThreadKind = "issues" | "pull";
 
 /// Given the contents of the `In-Reply-To` header, return a thread-id.
-export function parseGithubEmailInReplyTo(replyTo: string): ThreadId {
-    // Example: `In-Reply-To: <rust-lang/compiler-team/issues/512@github.com>`
-    let issuesRegex = /<([^/]*)\/([^/]*)\/issues\/([0-9]*)@github.com>/;
-    let match = issuesRegex.exec(replyTo);
+export function parseGithubEmailMessageId(messageId: string): ThreadId {
+    // Example: `<rust-lang/compiler-team/issues/512/1141006298@github.com>`
+    let issuesRegex = /<([^/]*)\/([^/]*)\/issues\/([0-9]*)(\/[^@]*)?@github.com>/;
+    let match = issuesRegex.exec(messageId);
     if (match !== null) {
         let org = match[1];
         let repo = match[2];
@@ -38,9 +38,10 @@ export function parseGithubEmailInReplyTo(replyTo: string): ThreadId {
         return new GithubThreadId(org, repo, "issues", id);
     }
 
-    // Example: `In-Reply-To: <rust-lang/rust/pull/95818@github.com>`
-    let pullRegex = /<([^/]*)\/([^/]*)\/pull\/([0-9]*)@github.com>/;
-    match = pullRegex.exec(replyTo);
+    // Example: `Message-ID: <salsa-rs/salsa/pull/302@github.com>`
+    // Example: `Message-ID: <salsa-rs/salsa/pull/302/c1141882412@github.com>`
+    let pullRegex = /<([^/]*)\/([^/]*)\/pull\/([0-9]*)(\/[^@]*)?@github.com>/;
+    match = pullRegex.exec(messageId);
     if (match !== null) {
         let org = match[1];
         let repo = match[2];
@@ -48,6 +49,7 @@ export function parseGithubEmailInReplyTo(replyTo: string): ThreadId {
         return new GithubThreadId(org, repo, "pull", id);
     }
 
-    throw new Error(`Unrecognized In-Reply-To string: ${replyTo}`);
+
+    throw new Error(`Unrecognized Message-ID string: \`${messageId}\``);
 }
 

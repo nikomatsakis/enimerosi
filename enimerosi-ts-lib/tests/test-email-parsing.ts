@@ -30,3 +30,15 @@ test('Email 2: mentions', async () => {
     let urls = notification.mentions.map(m => m.url);
     expect(JSON.stringify(urls)).toBe(`["https://github.com/petrochenkov","https://github.com/bors","https://github.com/orgs/rust-lang/teams/compiler"]`);
 });
+
+test('salsa-new-pr: thread-id', async () => {
+    let emailText = await readFile(join(__dirname, "/salsa-new-pr.eml"), { encoding: "utf8" });
+    let notification = await GithubEmailNotification.fromMailText(emailText);
+    expect(notification.threadId.idString).toBe('salsa-rs/salsa/pull/302');
+});
+
+test('salsa-pr-comment: thread-id', async () => {
+    let emailText = await readFile(join(__dirname, "/salsa-pr-comment.eml"), { encoding: "utf8" });
+    let notification = await GithubEmailNotification.fromMailText(emailText);
+    expect(notification.threadId.idString).toBe('salsa-rs/salsa/pull/302');
+});

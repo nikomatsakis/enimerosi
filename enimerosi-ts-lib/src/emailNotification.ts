@@ -3,7 +3,7 @@ import * as mailparser from "mailparser";
 import { GithubNotification, Reason, parseReason } from "./notification";
 import assert from "node:assert";
 import { Mention, UserMention, TeamMention } from "./mention";
-import { ThreadId, parseGithubEmailInReplyTo } from "./thread";
+import { ThreadId, parseGithubEmailMessageId } from "./thread";
 import { NotificationRecord } from "./db";
 
 /// A notification derived from a Github email.
@@ -28,15 +28,15 @@ export class GithubEmailNotification implements GithubNotification {
     }
 
     get recipient(): string {
-        return this.parsedMail.headers.get("X-GitHub-Recipient")!.toString();
+        return this.parsedMail.headers.get("x-github-recipient")!.toString();
     }
 
     get sender(): string {
-        return this.parsedMail.headers.get("X-GitHub-Sender")!.toString();
+        return this.parsedMail.headers.get("x-github-sender")!.toString();
     }
 
     get reason(): Reason {
-        let reason = this.parsedMail.headers.get("X-GitHub-Reason")!.toString()
+        let reason = this.parsedMail.headers.get("x-github-reason")!.toString()
         return parseReason(reason);
     }
 
@@ -62,8 +62,8 @@ export class GithubEmailNotification implements GithubNotification {
     }
 
     get threadId(): ThreadId {
-        let replyTo = this.parsedMail.inReplyTo;
-        assert(replyTo !== undefined);
-        return parseGithubEmailInReplyTo(replyTo.toString());
+        let messageId = this.parsedMail.messageId;
+        assert(messageId !== undefined);
+        return parseGithubEmailMessageId(messageId.toString());
     }
 }
