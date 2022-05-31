@@ -1,12 +1,14 @@
 import * as html from "node-html-parser";
 import * as mailparser from "mailparser";
-import { GithubNotification, Reason } from "./notification";
+import { GithubNotification, Reason, parseReason } from "./notification";
 import assert from "node:assert";
 import { Mention, UserMention, TeamMention } from "./mention";
 import { ThreadId, parseGithubEmailInReplyTo } from "./thread";
+import { NotificationRecord } from "./db";
 
 /// A notification derived from a Github email.
 export class GithubEmailNotification implements GithubNotification {
+    /// parsed version of the mail
     parsedMail: mailparser.ParsedMail;
     htmlBody: html.HTMLElement;
 
@@ -34,13 +36,8 @@ export class GithubEmailNotification implements GithubNotification {
     }
 
     get reason(): Reason {
-        // we ought to fetch this from the `X-GitHub-Reason` header but 
-        // it's a pain in the neck to validate that the string is what we expect, see
-        //
-        // https://stackoverflow.com/questions/36836011/checking-validity-of-string-literal-union-type-at-runtime
-        //
-        // So for now just return "unknown".
-        return "unknown";
+        let reason = this.parsedMail.headers.get("X-GitHub-Reason")!.toString()
+        return parseReason(reason);
     }
 
     get mentions(): Array<Mention> {

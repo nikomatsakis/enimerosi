@@ -1,5 +1,6 @@
 import { Mention } from "./mention";
 import { ThreadId } from "./thread";
+import * as db from "./db";
 
 export interface GithubNotification {
     /// Github username of the recipient of this notification.
@@ -39,3 +40,20 @@ export type Reason = (
     "your_activity" | // you did something
     "unknown" // Unknown reason
 );
+
+export function parseReason(reason: string): Reason {
+    if (reason === "assign") { return "assign"; }
+    if (reason === "author") { return "author"; }
+    if (reason === "ci_activity") { return "ci_activity"; }
+    if (reason === "comment") { return "comment"; }
+    if (reason === "manual") { return "manual"; }
+    if (reason === "mention") { return "mention"; }
+    if (reason === "push") { return "push"; }
+    if (reason === "review_requested") { return "review_requested"; }
+    if (reason === "security_alert") { return "security_alert"; }
+    if (reason === "state_change") { return "state_change"; }
+    if (reason === "subscribed") { return "subscribed"; }
+    if (reason === "team_mention") { return "team_mention"; }
+    if (reason === "your_activity") { return "your_activity"; }
+    return "unknown";
+}

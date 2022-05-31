@@ -11,10 +11,12 @@
         "isolatedModules": true,
         "declaration": true, /* Concatenate & emit output to single file.*/
         "outDir": "lib",
+        "strictNullChecks": true,
     },
     "include": [
-        "src"
-, "tests"    ],
+        "src",
+        "tests"
+    ],
     "exclude": [
         "node_modules",
         "**/*.test.ts"
