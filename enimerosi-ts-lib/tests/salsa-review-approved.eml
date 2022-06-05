@@ -1,0 +1,267 @@
+Return-Path: <noreply@github.com>
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+	 by sloti48n36 (Cyrus 3.7.0-alpha0-591-gfe6c3a2700-fm-20220427.001-gfe6c3a27) with LMTPA;
+	 Fri, 03 Jun 2022 05:20:43 -0400
+X-Cyrus-Session-Id: sloti48n36-1654248043-3937779-2-11354848515906006521
+X-Sieve: CMU Sieve 3.0
+X-Spam-known-sender: yes ("Address notifications@github.com in From header is in
+ addressbook"); in-addressbook
+X-Spam-sender-reputation: 0 (email)
+X-Spam-score: 0.0
+X-Spam-hits: BAYES_50 0.8, HTML_IMAGE_ONLY_20 1.546, HTML_MESSAGE 0.001,
+  MAILING_LIST_MULTI -1, ME_DMARC_IN_FMWL -0.001, ME_HAS_VSSU 0.001,
+  ME_SC_NH -0.001, ME_SENDERREP_DENY 4, RCVD_IN_BL_SPAMCOP_NET 2,
+  RCVD_IN_DNSWL_NONE -0.0001, RCVD_IN_MSPIKE_H2 -0.001,
+  SPF_HELO_NONE 0.001, SPF_SOFTFAIL 0.665, T_KAM_HTML_FONT_INVALID 0.01,
+  T_SCC_BODY_TEXT_LINE -0.01, LANGUAGES en, BAYES_USED user,
+  SA_VERSION 3.4.6
+X-Backscatter: NotFound1
+X-Backscatter-Hosts: 
+X-Spam-source: IP='64.90.62.163', Host='mx1.dreamhost.com', Country='US',
+  FromHeader='com', MailFrom='com'
+X-Spam-charsets: plain='UTF-8', html='UTF-8'
+X-Resolved-to: nikomatsakis@fastmail.fm
+X-Delivered-to: nikomatsakis@fastmail.fm
+X-Original-Delivered-to: notifications@nikomatsakis.com
+X-Mail-from: noreply@github.com
+Received: from mx4 ([10.202.2.203])
+  by compute2.internal (LMTPProxy); Fri, 03 Jun 2022 05:20:43 -0400
+Received: from mx4.messagingengine.com (localhost [127.0.0.1])
+	by mailmx.nyi.internal (Postfix) with ESMTP id 9A7381F2009E
+	for <nikomatsakis@fastmail.fm>; Fri,  3 Jun 2022 05:20:43 -0400 (EDT)
+Received: from mx4.messagingengine.com (localhost [127.0.0.1])
+    by mx4.messagingengine.com (Authentication Milter) with ESMTP
+    id 30A6FD63EB0;
+    Fri, 3 Jun 2022 05:20:43 -0400
+ARC-Seal: i=2; a=rsa-sha256; cv=pass; d=messagingengine.com; s=fm1; t=
+    1654248043; b=efF9gtxKvBeMwV9m53J0MtncknwzepnFl9jQ9FECfmATNAvqOK
+    9BqF4smhbrrUFOHiOP8XRIctkRvdOW/dahnID5fIjGovPLJO2eyruVEQ3g5aycai
+    syos9W9L3fakc81vkhtfEswsbNHCcu535zlkBhH4x5CJELek2HGiihKq7yX5vU5R
+    Ea1Oy+3D0W/vdg2wUgOzcvmRl6Vp7wPYn/yLTEHJwL4HFLJShj/Wa8Mo/VZ0HYGS
+    ixxKDOKpswERy6tjoyyh1eMauhkkLaeF7itpor3kzdnPv+zfb84a9A5oTNjadZnu
+    EvUG2YBjOKZsAjhvX61COZRqhPpwGX2mXrVA==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=
+    messagingengine.com; h=date:from:reply-to:to:cc:message-id
+    :in-reply-to:references:subject:mime-version:content-type
+    :content-transfer-encoding:list-id:list-archive:list-post
+    :list-unsubscribe; s=fm1; t=1654248043; bh=DkVafABByRyDWWzheLeE9
+    51tJgkNFfIJdUqtEf2gcNg=; b=HJ4m9Iuc1XVHHWUPnbcLQa9iiduxPWuwziICz
+    wU0iuMJ9ehCUoU4UQC+lcWXjnQ1vk+RDGPw8liYP3Q9hT68V1eyvqTMB4lp/EDjf
+    vd8iY38MtXRROshFkogbg36dWm1HQ+3vXYdG/+h+oj4eSUDoWti0kc8kGaCtxNO+
+    OfUi0n8yfqzriF9DrmtyL8P+kxOwswHO3f7PpovYe70N3YTg2h5EQ4WcB0LFc0Cu
+    BY9FrN0qlzoLGKPhzQzs7jtTlaERo7ieWrz0ME1+9cd4rrfR2YYEuH5KbBpJWRoY
+    oT9uq6//xwayyHRKpBJH15BFenRoWonVIViTbqoi7zbVqDm3w==
+ARC-Authentication-Results: i=2; mx4.messagingengine.com;
+    x-csa=none;
+    x-me-sender=none;
+    x-ptr=fail smtp.helo=pdx1-sub0-mail-mx210.dreamhost.com
+    policy.ptr=mx1.dreamhost.com;
+    bimi=none (No BIMI records found);
+    arc=pass (as.1.mailchannels.net=pass, ams.1.mailchannels.net=pass)
+    smtp.remote-ip=64.90.62.163;
+    dkim=pass (1024-bit rsa key sha256) header.d=github.com
+    header.i=@github.com header.b=fWaR08Z/ header.a=rsa-sha256
+    header.s=pf2014 x-bits=1024;
+    dmarc=pass policy.dwl=pass policy.published-domain-policy=reject
+    policy.applied-disposition=none policy.evaluated-disposition=none
+    (p=reject,has-list-id=yes,d=none,d.eval=none) policy.policy-from=p
+    header.from=github.com;
+    iprev=pass smtp.remote-ip=64.90.62.163 (mx1.dreamhost.com);
+    spf=softfail smtp.mailfrom=noreply@github.com
+    smtp.helo=pdx1-sub0-mail-mx210.dreamhost.com
+X-ME-Authentication-Results: mx4.messagingengine.com;
+    x-aligned-from=domain_pass (Domain match);
+    x-return-mx=pass header.domain=github.com policy.is_org=yes
+      (MX Records found: alt3.aspmx.l.google.com,alt4.aspmx.l.google.com,alt1.aspmx.l.google.com,alt2.aspmx.l.google.com,aspmx.l.google.com);
+    x-return-mx=pass smtp.domain=github.com policy.is_org=yes
+      (MX Records found: alt4.aspmx.l.google.com,alt1.aspmx.l.google.com,alt2.aspmx.l.google.com,aspmx.l.google.com,alt3.aspmx.l.google.com);
+    x-tls=pass smtp.version=TLSv1.3 smtp.cipher=TLS_AES_256_GCM_SHA384
+      smtp.bits=256/256;
+    x-vs=clean score=-80 state=0
+Authentication-Results: mx4.messagingengine.com;
+    x-csa=none;
+    x-me-sender=none;
+    x-ptr=fail smtp.helo=pdx1-sub0-mail-mx210.dreamhost.com
+      policy.ptr=mx1.dreamhost.com
+Authentication-Results: mx4.messagingengine.com;
+    bimi=none (No BIMI records found)
+Authentication-Results: mx4.messagingengine.com;
+    arc=pass (as.1.mailchannels.net=pass, ams.1.mailchannels.net=pass)
+      smtp.remote-ip=64.90.62.163
+Authentication-Results: mx4.messagingengine.com;
+    dkim=pass (1024-bit rsa key sha256) header.d=github.com
+      header.i=@github.com header.b=fWaR08Z/ header.a=rsa-sha256
+      header.s=pf2014 x-bits=1024;
+    dmarc=pass policy.dwl=pass policy.published-domain-policy=reject
+      policy.applied-disposition=none policy.evaluated-disposition=none
+      (p=reject,has-list-id=yes,d=none,d.eval=none) policy.policy-from=p
+      header.from=github.com;
+    iprev=pass smtp.remote-ip=64.90.62.163 (mx1.dreamhost.com);
+    spf=softfail smtp.mailfrom=noreply@github.com
+      smtp.helo=pdx1-sub0-mail-mx210.dreamhost.com
+X-ME-VSSU: VW5zdWI9aHR0cHM6Ly9naXRodWIuY29tL25vdGlmaWNhdGlvbnMvdW5zdWJzY3JpYmUtYX
+    V0aC9BQUJGNFpTM01QTFFDV1lUUVpKVldIVFZOSEU2TkFOQ05GU000N0pZSkJZQQ
+X-ME-VSSU: VW5zdWI9aHR0cHM6Ly9naXRodWIuY29tL25vdGlmaWNhdGlvbnMvdW5zdWJzY3JpYmUvQU
+    FCRjRaUzZKNFo1Rkg1QVVKUUg1TDNWTkhFNk5BTkNORlNNNDdKWUpCWUE
+X-ME-VSSU: VW5zdWI9bWFpbHRvOnVuc3ViK0FBQkY0WlE3SkVVQjc2MlQ0UUdKTUNPQVU0Q09ORVZCTk
+    hIRE80RFRaVUByZXBseS5naXRodWIuY29t
+X-ME-VSCause: gggruggvucftvghtrhhoucdtuddrgedvfedrleeigdduvdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenhdfknhhvihhsihgslhgvucifohhrughsucdlvddtmdenucfjughr
+    peffhfhrvfevkfgjfhfugggtgfhpjeegudfjsegrjeerredttdejnecuhfhrohhmpefpih
+    hkohcuofgrthhsrghkihhsuceonhhothhifhhitggrthhiohhnshesghhithhhuhgsrdgt
+    ohhmqeenucggtffrrghtthgvrhhnpeetueffvdektdetffetvdejleefjeejjeeutedtfe
+    dvheejfeffudefleeitedtjeenucffohhmrghinhepghhithhhuhgsrdgtohhmnecukfhp
+    peeigedrledtrdeivddrudeifedpudelvddrfedtrddvhedvrddvtddunecuvehluhhsth
+    gvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepieegrdeltddriedvrdduieefpdhh
+    vghlohepphgugiduqdhsuhgstddqmhgrihhlqdhmgidvuddtrdgurhgvrghmhhhoshhtrd
+    gtohhmpdhmrghilhhfrhhomhepoehnohhrvghplhihsehgihhthhhusgdrtghomheq
+X-ME-VSScore: -80
+X-ME-VSCategory: clean
+X-ME-CSA: none
+Received-SPF: softfail
+    (github.com: Sender is not authorized by default to use 'noreply@github.com' in 'mfrom' identity, however domain is not currently prepared for false failures (mechanism '~all' matched))
+    receiver=mx4.messagingengine.com;
+    identity=mailfrom;
+    envelope-from="noreply@github.com";
+    helo=pdx1-sub0-mail-mx210.dreamhost.com;
+    client-ip=64.90.62.163
+Received: from pdx1-sub0-mail-mx210.dreamhost.com (mx1.dreamhost.com [64.90.62.163])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx4.messagingengine.com (Postfix) with ESMTPS
+	for <nikomatsakis@fastmail.fm>; Fri,  3 Jun 2022 05:20:42 -0400 (EDT)
+Received: from postfix-inbound-v2-3.inbound.mailchannels.net (inbound-egress-6.mailchannels.net [199.10.31.238])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by pdx1-sub0-mail-mx210.dreamhost.com (Postfix) with ESMTPS id 4LDy6K0zd7z5xVQ
+	for <notifications@nikomatsakis.com>; Fri,  3 Jun 2022 02:20:41 -0700 (PDT)
+Received: from inbound-trex-0 (unknown [127.0.0.6])
+	by postfix-inbound-v2-3.inbound.mailchannels.net (Postfix) with ESMTP id 991DE800DE
+	for <notifications@nikomatsakis.com>; Fri,  3 Jun 2022 09:20:40 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1654248040; a=rsa-sha256;
+	cv=none;
+	b=RUnIxiumLDm+Aca+LRrpiNchyyA3sgpYisdKL8V0gFDp9dB07NmAvqhbJjb76RgL8bkva+
+	9CNi2k0xNlbQ9oqTlo/V3GCRncciQ34q7D94VrrRjdcZRDgylsMzVNimWTo73sHqaypPPd
+	LYxLxiB6zHzkVbTZWlG9lPiTdC5VdT1e/LdePU5Cweq7iCEDjEck0ARbMR8/UbAPcpJofh
+	TCdU+Q9UIIzLOJVZDQx5wEaDP5TzQ1EQ2QTmjzQBMObUItqWRF1zn0udwPFmZMeGEURyYP
+	6FaNZgIO/7g/4IJyZjEOYcwEil/iAUL2/C2NnrgddnYNN2nB1X4vG0gIs+o0BQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1654248040;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:list-id:
+	 list-unsubscribe:list-post:dkim-signature;
+	bh=DkVafABByRyDWWzheLeE951tJgkNFfIJdUqtEf2gcNg=;
+	b=jJ/ostWnmr2d55+ye2t/hP8lruFpxMOVd++SrSb16ThAdlWuSdursDaAZ4FuiwAOkUD0TK
+	lJLS9SC1kMLwbcB3P2h3KasTg8btyO2ZCXhZ9/2QnYpNx5RKDlM2KoSj/cOuXQ6jQ3iBh/
+	TOC/AI8+4i156LdAt2VGJ2wnA43I8l71ZU+soYxBK9GP4Njs6Wzmr+lMX+rnPuOjHUJT8x
+	WMnamwNX+82Q/aRrnMpL1R2uDiAd4SFclSabAx/aJSUoBNU975LnAdddOE3x/7RSwVRN5U
+	aGEzEHA64+ulzQKxoK9LI63xlD7tgA1nCkdTQvi/dnGp6dyfzEjaPKYe6ievMA==
+ARC-Authentication-Results: i=1;
+	inbound-rspamd-dc7bb8cb-dc9mt;
+	none
+X-Message-ID: mJz0jyISsDUgN1DeijjXX1ed
+Received: from smtp.github.com (out-18.smtp.github.com [192.30.252.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384)
+	by 100.127.81.223 (trex/6.7.1);
+	Fri, 03 Jun 2022 09:20:40 +0000
+Authentication-Results: inbound.mailchannels.net;
+ spf=pass smtp.mailfrom=noreply@github.com;
+ dkim=pass header.d=github.com;
+ dmarc=pass (policy=reject; pct=100; status=pass)
+Received-SPF: pass (dmarc-service-5f8597dfc-nb86p: domain of github.com
+ designates 192.30.252.201 as permitted sender) client-ip=192.30.252.201;
+ envelope-from=noreply@github.com; helo=smtp.github.com;
+Received: from github-lowworker-4acbd10.va3-iad.github.net (github-lowworker-4acbd10.va3-iad.github.net [10.48.112.93])
+	by smtp.github.com (Postfix) with ESMTP id 00F483408E2
+	for <notifications@nikomatsakis.com>; Fri,  3 Jun 2022 02:20:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2014; t=1654248039;
+	bh=DkVafABByRyDWWzheLeE951tJgkNFfIJdUqtEf2gcNg=;
+	h=Date:From:Reply-To:To:Cc:In-Reply-To:References:Subject:List-ID:
+	 List-Archive:List-Post:List-Unsubscribe:From;
+	b=fWaR08Z/L41tYl3ocaVZdaTXK29eE0MWXVJJcuEMQpHs0M70yuCTk/dzG/wAyE3Wz
+	 Dn+QLngR31MYK3cICoafpLiGB/yFBNoI7qiSwPKXBA/9oJbwP830dOzUXXIBM7OI/t
+	 jqx+wfhVtwMZQ7F9qxki8/1VrXcA/Fn5pPbERcxk=
+Date: Fri, 03 Jun 2022 02:20:38 -0700
+From: Niko Matsakis <notifications@github.com>
+Reply-To: salsa-rs/salsa <reply+AABF4ZQ7JEUB762T4QGJMCOAU4CONEVBNHHDO4DTZU@reply.github.com>
+To: salsa-rs/salsa <salsa@noreply.github.com>
+Cc: Niko Matsakis <notifications@nikomatsakis.com>, 
+ Your activity <your_activity@noreply.github.com>
+Message-ID: <salsa-rs/salsa/pull/275/review/994672927@github.com>
+In-Reply-To: <salsa-rs/salsa/pull/275@github.com>
+References: <salsa-rs/salsa/pull/275@github.com>
+Subject: Re: [salsa-rs/salsa] Expose the ability to remove the value from an
+ input query, taking ownership of the value (#275)
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_6299d266e6888_8a4ad6d81486fc";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Precedence: list
+X-GitHub-Sender: nikomatsakis
+X-GitHub-Recipient: nikomatsakis
+X-GitHub-Reason: your_activity
+List-ID: salsa-rs/salsa <salsa.salsa-rs.github.com>
+List-Archive: https://github.com/salsa-rs/salsa
+List-Post: <mailto:reply+AABF4ZQ7JEUB762T4QGJMCOAU4CONEVBNHHDO4DTZU@reply.github.com>
+List-Unsubscribe: <mailto:unsub+AABF4ZQ7JEUB762T4QGJMCOAU4CONEVBNHHDO4DTZU@reply.github.com>,
+ <https://github.com/notifications/unsubscribe/AABF4ZS6J4Z5FH5AUJQH5L3VNHE6NANCNFSM47JYJBYA>
+X-Auto-Response-Suppress: All
+X-GitHub-Recipient-Address: notifications@nikomatsakis.com
+
+
+----==_mimepart_6299d266e6888_8a4ad6d81486fc
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+@nikomatsakis approved this pull request.
+
+I know it's been super delayed, but I still think this is a good idea. I'm inclined to merge it. I'll try to adapt the other RFC.
+
+
+
+-- 
+Reply to this email directly or view it on GitHub:
+https://github.com/salsa-rs/salsa/pull/275#pullrequestreview-994672927
+You are receiving this because you are subscribed to this thread.
+
+Message ID: <salsa-rs/salsa/pull/275/review/994672927@github.com>
+----==_mimepart_6299d266e6888_8a4ad6d81486fc
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<p></p>
+<p><b>@nikomatsakis</b> approved this pull request.</p>
+
+<p dir="auto">I know it's been super delayed, but I still think this is a good idea. I'm inclined to merge it. I'll try to adapt the other RFC.</p>
+
+<p style="font-size:small;-webkit-text-size-adjust:none;color:#666;">&mdash;<br />Reply to this email directly, <a href="https://github.com/salsa-rs/salsa/pull/275#pullrequestreview-994672927">view it on GitHub</a>, or <a href="https://github.com/notifications/unsubscribe-auth/AABF4ZS3MPLQCWYTQZJVWHTVNHE6NANCNFSM47JYJBYA">unsubscribe</a>.<br />You are receiving this because you are subscribed to this thread.<img src="https://github.com/notifications/beacon/AABF4ZQOG2VUWSN63TKFOOTVNHE6NA5CNFSM47JYJBYKYY3PNVWWK3TUL52HS4DFWFIHK3DMKJSXC5LFON2FEZLWNFSXPKTDN5WW2ZLOORPWSZGOHNEYCHY.gif" height="1" width="1" alt="" /><span style="color: transparent; font-size: 0; display: none; visibility: hidden; overflow: hidden; opacity: 0; width: 0; height: 0; max-width: 0; max-height: 0; mso-hide: all">Message ID: <span>&lt;salsa-rs/salsa/pull/275/review/994672927</span><span>@</span><span>github</span><span>.</span><span>com&gt;</span></span></p>
+<script type="application/ld+json">[
+{
+"@context": "http://schema.org",
+"@type": "EmailMessage",
+"potentialAction": {
+"@type": "ViewAction",
+"target": "https://github.com/salsa-rs/salsa/pull/275#pullrequestreview-994672927",
+"url": "https://github.com/salsa-rs/salsa/pull/275#pullrequestreview-994672927",
+"name": "View Pull Request"
+},
+"description": "View this Pull Request on GitHub",
+"publisher": {
+"@type": "Organization",
+"name": "GitHub",
+"url": "https://github.com"
+}
+}
+]</script>
+----==_mimepart_6299d266e6888_8a4ad6d81486fc--

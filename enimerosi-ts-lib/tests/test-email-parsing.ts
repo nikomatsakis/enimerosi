@@ -42,3 +42,18 @@ test('salsa-pr-comment: thread-id', async () => {
     let notification = await GithubEmailNotification.fromMailText(emailText);
     expect(notification.threadId.idString).toBe('salsa-rs/salsa/pull/302');
 });
+
+test('salsa-review-approved', async () => {
+    let emailText = await readFile(join(__dirname, "/salsa-review-approved.eml"), { encoding: "utf8" });
+    let notification = await GithubEmailNotification.fromMailText(emailText);
+    expect(notification.threadId.idString).toBe('salsa-rs/salsa/pull/275');
+    expect(notification.reason).toBe('your_activity');
+    expect(notification.sender).toBe('nikomatsakis');
+});
+test('salsa-new-commits', async () => {
+    let emailText = await readFile(join(__dirname, "/salsa-new-commits.eml"), { encoding: "utf8" });
+    let notification = await GithubEmailNotification.fromMailText(emailText);
+    expect(notification.threadId.idString).toBe('salsa-rs/salsa/pull/275');
+    expect(notification.reason).toBe('push');
+    expect(notification.sender).toBe('nikomatsakis');
+});
