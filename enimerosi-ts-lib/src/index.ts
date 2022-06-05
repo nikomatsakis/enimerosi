@@ -1,3 +1,3 @@
 export { GithubEmailNotification } from "./emailNotification";
-export * from "./db";
-export * from "./dbThread";
+export type { ThreadRecord, NotificationRecord, NotificationIndex } from "./db";
+export { updateThreadRecord } from "./dbThread";

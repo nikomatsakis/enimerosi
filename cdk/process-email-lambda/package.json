@@ -21,7 +21,6 @@
     "@types/aws-lambda": "^8.10.97",
     "@types/jest": "^27.5.0",
     "@types/mailparser": "^3.4.0",
-    "@types/node": "10.17.27",
     "@types/prettier": "2.6.0",
     "aws-sdk": "^2.1145.0",
     "jest": "^28.1.0"

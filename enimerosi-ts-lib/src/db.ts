@@ -50,7 +50,3 @@ export interface NotificationRecord {
     /// Key of email within the s3 bucket
     key: string;
 }
-
-export function cloneThreadRecord(threadRecord: ThreadRecord): ThreadRecord {
-    return JSON.parse(JSON.stringify(threadRecord));
-}

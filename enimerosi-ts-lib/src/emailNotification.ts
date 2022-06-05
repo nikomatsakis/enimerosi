@@ -4,7 +4,6 @@ import { GithubNotification, Reason, parseReason } from "./notification";
 import assert from "node:assert";
 import { Mention, UserMention, TeamMention } from "./mention";
 import { ThreadId, parseGithubEmailMessageId } from "./thread";
-import { NotificationRecord } from "./db";
 
 /// A notification derived from a Github email.
 export class GithubEmailNotification implements GithubNotification {

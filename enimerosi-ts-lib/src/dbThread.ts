@@ -17,7 +17,7 @@ export function updateThreadRecord(oldThreadRecord: db.ThreadRecord | undefined,
     }
     assert(oldThreadRecord.threadId === notification.threadId.idString);
 
-    let newThreadRecord = db.cloneThreadRecord(oldThreadRecord);
+    let newThreadRecord = cloneThreadRecord(oldThreadRecord);
     newThreadRecord.maxIndex += 1;
 
     let messageIndex = newThreadRecord.maxIndex;
@@ -29,6 +29,10 @@ export function updateThreadRecord(oldThreadRecord: db.ThreadRecord | undefined,
     }
 
     return newThreadRecord;
+}
+
+function cloneThreadRecord(threadRecord: db.ThreadRecord): db.ThreadRecord {
+    return JSON.parse(JSON.stringify(threadRecord));
 }
 
 /// Update the thread record with a message from me.

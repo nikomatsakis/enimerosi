@@ -1,6 +1,5 @@
 import { Mention } from "./mention";
 import { ThreadId } from "./thread";
-import * as db from "./db";
 
 export interface GithubNotification {
     /// Github username of the recipient of this notification.
