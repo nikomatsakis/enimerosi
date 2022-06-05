@@ -1,5 +1,6 @@
 import * as db from "./db";
 import { GithubNotification } from "./notification";
+import assert from "node:assert";
 
 /// Given the old thread-record from the database (or undefined if none exists), 
 /// and a new incoming notification, returns a new thread record.
@@ -12,8 +13,9 @@ import { GithubNotification } from "./notification";
 /// thread-record.
 export function updateThreadRecord(oldThreadRecord: db.ThreadRecord | undefined, notification: GithubNotification): db.ThreadRecord {
     if (oldThreadRecord === undefined) {
-        return createNewThreadRecord(notification);
+        oldThreadRecord = createNewThreadRecord(notification);
     }
+    assert(oldThreadRecord.threadId === notification.threadId.idString);
 
     let newThreadRecord = db.cloneThreadRecord(oldThreadRecord);
     newThreadRecord.maxIndex += 1;
@@ -74,7 +76,7 @@ function createNewThreadRecord(notification: GithubNotification): db.ThreadRecor
     return {
         threadId: notification.threadId.idString,
         index: 0,
-        maxIndex: 1,
+        maxIndex: 0,
         mentionedByMe: [],
     };
 }
