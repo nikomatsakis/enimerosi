@@ -14,6 +14,7 @@
   "dependencies": {
     "aws-lambda": "^1.0.7",
     "aws-xray-sdk-core": "^3.3.5",
+    "enimerosi-ts-lib": "file:../../enimerosi-ts-lib",
     "mailparser": "^3.5.0"
   },
   "devDependencies": {
