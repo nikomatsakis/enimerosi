@@ -72,10 +72,16 @@ export async function main(event: S3Event, context: Context): Promise<any> {
 export async function fetchDbThread(notification: GithubEmailNotification): Promise<ThreadRecord | undefined> {
     let ddb = new DynamoDB.DocumentClient();
     let tableName: string = process.env.tableName!;
-    let response = await ddb.get({
+    let parameters = {
         TableName: tableName,
         Key: { "threadId": notification.threadId.idString, "index": 0 },
-    }).promise();
+    };
+    console.log({
+        level: "debug",
+        note: "fetching thread from dynamodb",
+        parameters,
+    });
+    let response = await ddb.get(parameters).promise();
     if (response.Item === null) {
         return undefined;
     }
