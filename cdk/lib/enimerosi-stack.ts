@@ -8,6 +8,7 @@ import * as ses from 'aws-cdk-lib/aws-ses';
 import * as ses_actions from 'aws-cdk-lib/aws-ses-actions';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as path from 'path';
+import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 
 export class EnimerosiStack extends Stack {
@@ -17,12 +18,23 @@ export class EnimerosiStack extends Stack {
     // This bucket stores the full text of every email.
     const emailsBucket = new s3.Bucket(this, 'EmailsBucket');
 
+    // DynamoDB database for storing notification metadata
+    // extracted about each notifiation (via the lambda below).
+    const threadDb = new dynamodb.Table(this, 'ThreadDb', {
+      partitionKey: { name: 'thread', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'index', type: dynamodb.AttributeType.NUMBER },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+
     // Each message that is delivered will be stored into S3. S3 then
     // invokes this lambda.
     const fn = new NodejsFunction(this, 'ProcessEmail', {
       runtime: lambda.Runtime.NODEJS_16_X,
       handler: 'main',
       entry: path.join(__dirname, `/../process-email-lambda/index.ts`),
+      environment: {
+        "threadDb": threadDb.tableName,
+      },
       bundling: {
         minify: true,
         externalModules: ['aws-sdk'],
@@ -30,6 +42,7 @@ export class EnimerosiStack extends Stack {
       tracing: lambda.Tracing.ACTIVE,
     });
     emailsBucket.grantRead(fn);
+    threadDb.grantReadWriteData(fn);
     emailsBucket.addObjectCreatedNotification(new s3n.LambdaDestination(fn));
 
     // Simple Email Service that receives notifications from github,
