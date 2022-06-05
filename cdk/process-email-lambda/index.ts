@@ -74,7 +74,7 @@ export async function fetchDbThread(notification: GithubEmailNotification): Prom
     let tableName: string = process.env.threadDb!;
     let parameters = {
         TableName: tableName,
-        Key: { "threadId": notification.threadId.idString, "index": 0 },
+        Key: { threadId: notification.threadId.idString, notificationIndex: 0 },
     };
     console.log({
         level: "debug",
@@ -129,7 +129,7 @@ export async function tryStoreDbThreadAndNotification(token: string, oldDbThread
                 Put: {
                     Item: newDbNotification,
                     TableName: tableName,
-                    ConditionExpression: "attribute_not_exists(index)",
+                    ConditionExpression: "attribute_not_exists(notificationIndex)",
                 }
             },
         ],

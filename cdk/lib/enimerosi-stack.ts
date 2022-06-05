@@ -1,5 +1,6 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import { Duration } from 'aws-cdk-lib';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
 import * as sns from 'aws-cdk-lib/aws-sns';
@@ -39,6 +40,7 @@ export class EnimerosiStack extends Stack {
         minify: true,
         externalModules: ['aws-sdk'],
       },
+      timeout: Duration.seconds(10), // dynamodb requests can be time consuming
       tracing: lambda.Tracing.ACTIVE,
     });
     emailsBucket.grantRead(fn);
