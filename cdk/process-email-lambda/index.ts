@@ -36,7 +36,7 @@ export async function main(event: S3Event, context: Context): Promise<any> {
                 let newDbThread = updateThreadRecord(dbThread, notification);
                 let newDbNotification: NotificationRecord = {
                     threadId: notification.threadId.idString,
-                    index: newDbThread.maxIndex,
+                    notificationIndex: newDbThread.maxNotificationIndex,
                     notificationType: "email",
                     bucket,
                     key: messageId,
@@ -71,7 +71,7 @@ export async function main(event: S3Event, context: Context): Promise<any> {
 
 export async function fetchDbThread(notification: GithubEmailNotification): Promise<ThreadRecord | undefined> {
     let ddb = new DynamoDB.DocumentClient();
-    let tableName: string = process.env.tableName!;
+    let tableName: string = process.env.threadDb!;
     let parameters = {
         TableName: tableName,
         Key: { "threadId": notification.threadId.idString, "index": 0 },
@@ -90,7 +90,7 @@ export async function fetchDbThread(notification: GithubEmailNotification): Prom
 }
 
 export async function tryStoreDbThreadAndNotification(token: string, oldDbThread: ThreadRecord | undefined, newDbThread: ThreadRecord, newDbNotification: NotificationRecord): Promise<boolean> {
-    let tableName: string = process.env.tableName!;
+    let tableName: string = process.env.threadDb!;
 
     console.log({
         level: "debug",
@@ -104,33 +104,52 @@ export async function tryStoreDbThreadAndNotification(token: string, oldDbThread
 
     let ddb = new DynamoDB.DocumentClient();
 
-    let [putNewThreadCondition, putNewThreadParameters] = (oldDbThread === undefined
-        ? ["attribute_not_exists(maxIndex)", {}]
-        : ["maxIndex = :maxIndex", { "maxIndex": oldDbThread.maxIndex }]
+    let putNewThread: DynamoDB.DocumentClient.TransactWriteItem = (oldDbThread === undefined
+        ? {
+            Put: {
+                Item: newDbThread,
+                TableName: tableName,
+                ConditionExpression: "attribute_not_exists(maxNotificationIndex)",
+            }
+        }
+        : {
+            Put: {
+                Item: newDbThread,
+                TableName: tableName,
+                ConditionExpression: "maxNotificationIndex = :maxNotificationIndex",
+                ExpressionAttributeValues: { ":maxNotificationIndex": oldDbThread.maxNotificationIndex },
+            }
+        }
     );
 
     let parameters: DynamoDB.DocumentClient.TransactWriteItemsInput = {
         TransactItems: [
-            {
-                Put: {
-                    Item: newDbThread,
-                    TableName: tableName,
-                    ConditionExpression: putNewThreadCondition,
-                    ExpressionAttributeValues: putNewThreadParameters,
-                }
-            },
+            putNewThread,
             {
                 Put: {
                     Item: newDbNotification,
                     TableName: tableName,
-                    ConditionExpression: "",
+                    ConditionExpression: "attribute_not_exists(index)",
                 }
             },
         ],
-        ClientRequestToken: token,
+
+        // the token must be less than 36 characters
+        // ClientRequestToken: token,
     };
     try {
-        await ddb.transactWrite(parameters).promise();
+        console.log({
+            level: "debug",
+            note: "submitting dynamodb transaction",
+            parameters: JSON.stringify(parameters, undefined, 2),
+        });
+        let result = await ddb.transactWrite(parameters).promise();
+        console.log({
+            level: "debug",
+            note: "transaction succeeded",
+            parameters: JSON.stringify(parameters, undefined, 2),
+            result: JSON.stringify(result, undefined, 2),
+        });
         return true;
     } catch (error) {
         // Presumably a transaction failure -- I don't know how to check more precisely that this is what it is,
@@ -138,7 +157,7 @@ export async function tryStoreDbThreadAndNotification(token: string, oldDbThread
         console.log({
             level: "debug",
             note: "transaction failed",
-            parameters,
+            parameters: JSON.stringify(parameters, undefined, 2),
             error,
         });
         return false;

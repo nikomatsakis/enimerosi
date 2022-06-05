@@ -6,7 +6,7 @@ import assert from "node:assert";
 /// and a new incoming notification, returns a new thread record.
 ///
 /// This new thread-record and the notification record for `notification` should be 
-/// inserted into the database atomically. The index for `notification` is the `maxIndex`
+/// inserted into the database atomically. The index for `notification` is the `maxNotificationIndex`
 /// field in the new thread record.
 ///
 /// Has no side-effects, so if insertion fails (contention), then can be re-run with the new
@@ -18,14 +18,14 @@ export function updateThreadRecord(oldThreadRecord: db.ThreadRecord | undefined,
     assert(oldThreadRecord.threadId === notification.threadId.idString);
 
     let newThreadRecord = cloneThreadRecord(oldThreadRecord);
-    newThreadRecord.maxIndex += 1;
+    newThreadRecord.maxNotificationIndex += 1;
 
-    let messageIndex = newThreadRecord.maxIndex;
+    let notificationIndex = newThreadRecord.maxNotificationIndex;
 
     if (notification.recipient == notification.sender) {
-        updateThreadRecordWithMyNotification(notification, newThreadRecord, messageIndex);
+        updateThreadRecordWithMyNotification(notification, newThreadRecord, notificationIndex);
     } else {
-        updateThreadRecordWithOtherNotification(notification, newThreadRecord, messageIndex);
+        updateThreadRecordWithOtherNotification(notification, newThreadRecord, notificationIndex);
     }
 
     return newThreadRecord;
@@ -36,7 +36,7 @@ function cloneThreadRecord(threadRecord: db.ThreadRecord): db.ThreadRecord {
 }
 
 /// Update the thread record with a message from me.
-function updateThreadRecordWithMyNotification(notification: GithubNotification, newThreadRecord: db.ThreadRecord, messageIndex: number) {
+function updateThreadRecordWithMyNotification(notification: GithubNotification, newThreadRecord: db.ThreadRecord, notificationIndex: number) {
     for (let mention of notification.mentions) {
         let mentionName = mention.name;
         if (newThreadRecord.mentionedByMe.indexOf(mentionName) == -1) {
@@ -45,24 +45,24 @@ function updateThreadRecordWithMyNotification(notification: GithubNotification, 
     }
 
     // Update the record of when I last commented.
-    newThreadRecord.lastCommented = messageIndex;
+    newThreadRecord.lastCommented = notificationIndex;
 }
 
 /// Update the thread record with a message from someone else.
-function updateThreadRecordWithOtherNotification(notification: GithubNotification, newThreadRecord: db.ThreadRecord, messageIndex: number) {
+function updateThreadRecordWithOtherNotification(notification: GithubNotification, newThreadRecord: db.ThreadRecord, notificationIndex: number) {
     let myName = notification.recipient;
 
     // Is the sender someone who I have mentioned on this thread? If so, maybe
     // they are responding to me.
     let mentionedByMe = newThreadRecord.mentionedByMe.indexOf(notification.sender) != -1;
     if (mentionedByMe) {
-        newThreadRecord.lastResponded = messageIndex;
+        newThreadRecord.lastResponded = notificationIndex;
     }
 
     // Was I (or a team that I am on) mentioned by this message?
     for (let mention of notification.mentions) {
         if (mention.name === myName) {
-            newThreadRecord.lastMentioned = messageIndex;
+            newThreadRecord.lastMentioned = notificationIndex;
         }
 
         if (mention.isTeam) {
@@ -70,7 +70,7 @@ function updateThreadRecordWithOtherNotification(notification: GithubNotificatio
             // so just check if this message has a `team_mention` setting, which is a
             // decent heuristic for the moment.
             if (notification.reason === "team_mention") {
-                newThreadRecord.teamLastMentioned = messageIndex;
+                newThreadRecord.teamLastMentioned = notificationIndex;
             }
         }
     }
@@ -79,8 +79,8 @@ function updateThreadRecordWithOtherNotification(notification: GithubNotificatio
 function createNewThreadRecord(notification: GithubNotification): db.ThreadRecord {
     return {
         threadId: notification.threadId.idString,
-        index: 0,
-        maxIndex: 0,
+        notificationIndex: 0,
+        maxNotificationIndex: 0,
         mentionedByMe: [],
     };
 }

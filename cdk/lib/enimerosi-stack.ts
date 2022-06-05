@@ -21,8 +21,8 @@ export class EnimerosiStack extends Stack {
     // DynamoDB database for storing notification metadata
     // extracted about each notifiation (via the lambda below).
     const threadDb = new dynamodb.Table(this, 'ThreadDb', {
-      partitionKey: { name: 'thread', type: dynamodb.AttributeType.STRING },
-      sortKey: { name: 'index', type: dynamodb.AttributeType.NUMBER },
+      partitionKey: { name: 'threadId', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'notificationIndex', type: dynamodb.AttributeType.NUMBER },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
     });
 
