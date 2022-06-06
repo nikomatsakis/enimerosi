@@ -1,8 +1,6 @@
 import { Context, S3Event } from 'aws-lambda';
 import { S3, DynamoDB } from 'aws-sdk';
-import { String } from 'aws-sdk/clients/acm';
-import { simpleParser } from 'mailparser';
-import { GithubEmailNotification, ThreadRecord, updateThreadRecord, NotificationRecord } from 'enimerosi-ts-lib/src'; // "/src"??
+import { GithubEmailNotification, ThreadRecord, updateThreadRecord, NotificationRecord, tokenize } from 'enimerosi-ts-lib/src'; // "/src"??
 
 export async function main(event: S3Event, context: Context): Promise<any> {
     console.log({
@@ -25,6 +23,7 @@ export async function main(event: S3Event, context: Context): Promise<any> {
             let messageContents = await s3.getObject({ Bucket: bucket, Key: messageId }).promise();
             let body = messageContents.Body!.toString();
             let notification = await GithubEmailNotification.fromMailText(body);
+            let token = tokenize(messageId);
             console.log({
                 level: "debug",
                 note: "email parsed",
@@ -41,7 +40,7 @@ export async function main(event: S3Event, context: Context): Promise<any> {
                     bucket,
                     key: messageId,
                 };
-                if (await tryStoreDbThreadAndNotification(messageId, dbThread, newDbThread, newDbNotification)) {
+                if (await tryStoreDbThreadAndNotification(token, dbThread, newDbThread, newDbNotification)) {
                     break;
                 } else {
                     counter += 1;
@@ -134,8 +133,7 @@ export async function tryStoreDbThreadAndNotification(token: string, oldDbThread
             },
         ],
 
-        // the token must be less than 36 characters
-        // ClientRequestToken: token,
+        ClientRequestToken: token,
     };
     try {
         console.log({
