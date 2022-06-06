@@ -20,6 +20,19 @@ export interface GithubNotification {
 
     /// The thread-id identifies 
     get threadId(): ThreadId;
+
+    linkData: LinkData | undefined;
+}
+
+export interface LinkData {
+    description: string;
+    viewAction: ViewAction | undefined;
+}
+
+export interface ViewAction {
+    target: string;
+    url: string;
+    name: string;
 }
 
 /// Reasons that notifications are given.

@@ -1,6 +1,6 @@
 import * as html from "node-html-parser";
 import * as mailparser from "mailparser";
-import { GithubNotification, Reason, parseReason } from "./notification";
+import { GithubNotification, Reason, parseReason, LinkData, ViewAction } from "./notification";
 import assert from "node:assert";
 import { Mention, UserMention, TeamMention } from "./mention";
 import { ThreadId, parseGithubEmailMessageId } from "./thread";
@@ -64,5 +64,49 @@ export class GithubEmailNotification implements GithubNotification {
         let messageId = this.parsedMail.messageId;
         assert(messageId !== undefined);
         return parseGithubEmailMessageId(messageId.toString());
+    }
+
+    get linkData(): LinkData | undefined {
+        let scripts = this.htmlBody.querySelectorAll("script");
+
+        let description: string | undefined = undefined;
+        let viewAction: ViewAction | undefined = undefined;
+
+        for (let script of scripts) {
+            let scriptType = script.getAttribute("type");
+            if (scriptType !== "application/ld+json") { continue; }
+            let jsons;
+            try {
+                jsons = JSON.parse(script.innerText);
+            } catch (e) {
+                continue;
+            }
+            for (let json of jsons) {
+                if (json["@context"] !== "http://schema.org") { continue; }
+                if (json["@type"] !== "EmailMessage") { continue; }
+                let jdescription = json["description"];
+                if (typeof jdescription === "string") {
+                    description = jdescription;
+                }
+                let potentialAction = json["potentialAction"];
+                if (potentialAction === undefined) { continue; }
+                if (potentialAction["@type"] !== "ViewAction") { continue; }
+                let target = potentialAction["target"];
+                if (typeof target !== "string") { continue; }
+                let url = potentialAction["url"];
+                if (typeof url !== "string") { continue; }
+                let name = potentialAction["name"];
+                if (typeof name !== "string") { continue; }
+                viewAction = { target, url, name };
+            }
+        }
+
+        if (description === undefined)
+            return undefined;
+
+        return {
+            description,
+            viewAction,
+        };
     }
 }

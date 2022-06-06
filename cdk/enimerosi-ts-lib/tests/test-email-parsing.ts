@@ -50,10 +50,21 @@ test('salsa-review-approved', async () => {
     expect(notification.reason).toBe('your_activity');
     expect(notification.sender).toBe('nikomatsakis');
 });
+
 test('salsa-new-commits', async () => {
     let emailText = await readFile(join(__dirname, "/salsa-new-commits.eml"), { encoding: "utf8" });
     let notification = await GithubEmailNotification.fromMailText(emailText);
     expect(notification.threadId.idString).toBe('salsa-rs/salsa/pull/275');
     expect(notification.reason).toBe('push');
     expect(notification.sender).toBe('nikomatsakis');
+    expect(JSON.stringify(notification.linkData, undefined, 2)).toBe(
+        JSON.stringify({
+            "description": "View this Pull Request on GitHub",
+            "viewAction": {
+                "target": "https://github.com/salsa-rs/salsa/pull/275/files/1e3c2f22aa8b3a1515cfe2e8ca6574713fe3abee..26e099eb12b2d0e3f583e245497e10369aaecb04",
+                "url": "https://github.com/salsa-rs/salsa/pull/275/files/1e3c2f22aa8b3a1515cfe2e8ca6574713fe3abee..26e099eb12b2d0e3f583e245497e10369aaecb04",
+                "name": "View Pull Request"
+            }
+        }, undefined, 2)
+    );
 });
