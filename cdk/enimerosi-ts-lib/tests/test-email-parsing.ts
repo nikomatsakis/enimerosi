@@ -14,6 +14,18 @@ test('Email 1: mentions', async () => {
     expect(notification.mentions.length).toBe(1);
     expect(notification.mentions[0].name).toBe("rustbot");
     expect(notification.mentions[0].url.toString()).toBe("https://github.com/rustbot");
+    expect(notification.html).toBe(
+        "<p></p>\n" +
+        "<p><a href=\"https://github.com/rustbot\">@rustbot</a> second</p>\n" +
+        "\n" +
+        "<p>—<br />Reply to this email directly, " +
+        "<a href=\"https://github.com/rust-lang/compiler-team/issues/512#issuecomment-1141006298\">" +
+        "view it on GitHub</a>, or " +
+        "<a href=\"https://github.com/notifications/unsubscribe-auth/AABF4ZV62EBNI4NPLADGWYLVMSMRRANCNFSM5UV5VVHQ\">unsubscribe</a>" +
+        ".<br />You are receiving this because you are on a team that was mentioned." +
+        "<span>Message ID: <span>&lt;rust-lang/compiler-team/issues/512/1141006298</span>" +
+        "<span>@</span><span>github</span><span>.</span><span>com&gt;</span></span></p>\n"
+    );
 });
 
 test('Email 2: thread-id', async () => {

@@ -4,6 +4,7 @@ import { GithubNotification, Reason, parseReason, LinkData, ViewAction } from ".
 import assert from "node:assert";
 import { Mention, UserMention, TeamMention } from "./mention";
 import { ThreadId, parseGithubEmailMessageId } from "./thread";
+import sanitize from "sanitize-html";
 
 /// A notification derived from a Github email.
 export class GithubEmailNotification implements GithubNotification {
@@ -108,5 +109,13 @@ export class GithubEmailNotification implements GithubNotification {
             description,
             viewAction,
         };
+    }
+
+    get html(): string {
+        let html = this.parsedMail.html;
+        if (typeof html === "string") {
+            return sanitize(html);
+        }
+        return "";
     }
 }

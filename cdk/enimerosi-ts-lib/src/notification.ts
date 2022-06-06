@@ -21,7 +21,11 @@ export interface GithubNotification {
     /// The thread-id identifies 
     get threadId(): ThreadId;
 
+    /// Link-data (if any) included in the email
     linkData: LinkData | undefined;
+
+    /// HTML body (sanitized)
+    html: string;
 }
 
 export interface LinkData {
