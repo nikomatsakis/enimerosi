@@ -25,18 +25,26 @@ export class EnimerosiStack extends Stack {
     // extracted about each notifiation (via the lambda below).
     const threadDb = new dynamodb.Table(this, 'ThreadDb', {
       partitionKey: { name: 'threadId', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+
+    // DynamoDB database for storing notification metadata
+    // extracted about each notifiation (via the lambda below).
+    const notificationsDb = new dynamodb.Table(this, 'NotificationsDb', {
+      partitionKey: { name: 'threadId', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'notificationIndex', type: dynamodb.AttributeType.NUMBER },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
     });
 
     // Each message that is delivered will be stored into S3. S3 then
     // invokes this lambda.
-    const fn = new NodejsFunction(this, 'ProcessEmail', {
+    const processEmailLambda = new NodejsFunction(this, 'ProcessEmail', {
       runtime: lambda.Runtime.NODEJS_16_X,
       handler: 'main',
       entry: path.join(__dirname, `/../process-email-lambda/index.ts`),
       environment: {
         "threadDb": threadDb.tableName,
+        "notificationsDb": notificationsDb.tableName,
       },
       bundling: {
         minify: true,
@@ -45,9 +53,10 @@ export class EnimerosiStack extends Stack {
       timeout: Duration.seconds(10), // dynamodb requests can be time consuming
       tracing: lambda.Tracing.ACTIVE,
     });
-    emailsBucket.grantRead(fn);
-    threadDb.grantReadWriteData(fn);
-    emailsBucket.addObjectCreatedNotification(new s3n.LambdaDestination(fn));
+    emailsBucket.grantRead(processEmailLambda);
+    threadDb.grantReadWriteData(processEmailLambda);
+    notificationsDb.gdrantReadWriteData(processEmailLambda);
+    emailsBucket.addObjectCreatedNotification(new s3n.LambdaDestination(processEmailLambda));
 
     // Simple Email Service that receives notifications from github,
     // stores them in S3, and then invokes the lambda above.
@@ -78,6 +87,7 @@ export class EnimerosiStack extends Stack {
       entry: path.join(__dirname, "/../get-notifications-lambda/index.ts"),
       environment: {
         "threadDb": threadDb.tableName,
+        "notificationsDb": notificationsDb.tableName,
       },
       bundling: {
         minify: true,
@@ -86,8 +96,9 @@ export class EnimerosiStack extends Stack {
       timeout: Duration.seconds(10), // dynamodb requests can be time consuming
       tracing: lambda.Tracing.ACTIVE,
     });
-    emailsBucket.grantRead(fn);
-    threadDb.grantReadData(fn);
+    emailsBucket.grantRead(getNotificationLambda);
+    threadDb.grantReadData(getNotificationLambda);
+    notificationsDb.grantReadData(getNotificationLambda);
 
     // AppSync API definition for graphql
     const threadApi = new appsync.GraphqlApi(this, 'threadApi', {
@@ -107,9 +118,7 @@ export class EnimerosiStack extends Stack {
       requestMappingTemplate: appsync.MappingTemplate.dynamoDbQuery(appsync.KeyCondition.eq("notificationIndex", "0")),
       responseMappingTemplate: appsync.MappingTemplate.dynamoDbResultList(),
     });
-    const getNotificationLambdaDataSource = threadApi.addLambdaDataSource('getNotificationLambdaDataSource', getNotificationLambda, {
-
-    });
+    const getNotificationLambdaDataSource = threadApi.addLambdaDataSource('getNotificationLambdaDataSource', getNotificationLambda);
     getNotificationLambdaDataSource.createResolver({
       typeName: 'Query',
       fieldName: 'getNotifications',
