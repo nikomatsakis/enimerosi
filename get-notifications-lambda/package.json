@@ -1,0 +1,26 @@
+{
+  "name": "get-notifications-lambda",
+  "version": "1.0.0",
+  "description": "Definition for the 'getNotifications' graphql query",
+  "main": "index.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk"
+  },
+  "author": "Nicholas Matsakis",
+  "license": "MIT",
+  "devDependencies": {
+    "@graphql-codegen/cli": "^2.6.2",
+    "@graphql-codegen/typescript": "^2.5.0",
+    "@types/aws-lambda": "^8.10.99",
+    "ts-jest": "^28.0.4",
+    "typescript": "^4.7.3"
+  },
+  "dependencies": {
+    "aws-lambda": "^1.0.7",
+    "aws-sdk": "^2.1150.0",
+    "range-seq": "^1.0.0"
+  }
+}

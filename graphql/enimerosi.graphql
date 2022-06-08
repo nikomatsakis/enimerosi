@@ -1,6 +1,5 @@
 schema {
     query: Query,
-    subscription: Subcription,
 }
     
 type Query {
@@ -11,10 +10,6 @@ type Query {
         startNotificationIndex: Int!,
         endNotificationIndex: Int!
     ): [Notification!]!
-}
-
-type Subscription {
-
 }
 
 """
@@ -61,7 +56,7 @@ type Thread {
     """
     github usernames that user has mentioned
     """
-    mentionedByMe: [string]!
+    mentionedByMe: [String]!
 }
 
 type Notification {
@@ -77,11 +72,4 @@ type Notification {
     and is safe to be embedded in client-side web pages.
     """
     html: String!   
-}
-
-subscription sub1 {
-  onCreateMyModelType {
-    id
-    title
-  }
 }

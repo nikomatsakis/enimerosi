@@ -1,0 +1,22 @@
+{
+    "MusicCollection": {
+        "EnimerosiStack-ThreadDb5A516EB9-104R6I5495H1H": [
+            {
+                "ThreadId": {
+                    "S": "rust-lang/blog.rust-lang.org/pull/982"
+                },
+                "notificationIndex": {
+                    "N": 1
+                }
+            },
+            {
+                "ThreadId": {
+                    "S": "rust-lang/blog.rust-lang.org/pull/982"
+                },
+                "notificationIndex": {
+                    "N": 2
+                }
+            }
+        ]
+    }
+}
