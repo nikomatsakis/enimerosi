@@ -1,0 +1,87 @@
+schema {
+    query: Query,
+    subscription: Subcription,
+}
+    
+type Query {
+    getThreads: [Thread!]!
+
+    getNotifications(
+        threadId: String!,
+        startNotificationIndex: Int!,
+        endNotificationIndex: Int!
+    ): [Notification!]!
+}
+
+type Subscription {
+
+}
+
+"""
+A `Thread` is a source of comments etc, e.g. a PR, issue. 
+"""
+type Thread {
+    # This maps directly to the dynamodb, which is intentional,
+    # because it means we can handle subscriptions that way.
+
+    """
+    Id of the thread with the structure `org/repo/kind/id`
+
+    e.g., `rust-lang/rust/pulls/122`
+    """
+    threadId: String!
+
+    """
+    Maximum notification index `N` for this thread.
+    
+    Notifications are in the range `0..N` (exclusive).
+    """
+    maxNotificationIndex: Int!
+
+    """
+    If present, index of the last comment by this user
+    """
+    lastCommented: Int
+
+    """
+    If present, index of the last comment that mentions this user
+    """
+    lastMentioned: Int
+
+    """
+    If present, index of the last comment that mentions a team I am on
+    """
+    teamLastMentioned: Int
+
+    """
+    If present, index of the last comment by someone that I have mentioned
+    """
+    lastResponded: Int
+
+    """
+    github usernames that user has mentioned
+    """
+    mentionedByMe: [string]!
+}
+
+type Notification {
+    """
+    github username whose activity originated this comment
+    """
+    author: String!
+
+    """
+    html text
+    
+    This text has been sanitized via https://www.npmjs.com/package/sanitize-html
+    and is safe to be embedded in client-side web pages.
+    """
+    html: String!   
+}
+
+subscription sub1 {
+  onCreateMyModelType {
+    id
+    title
+  }
+}

@@ -10,7 +10,9 @@ import * as ses_actions from 'aws-cdk-lib/aws-ses-actions';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as path from 'path';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as appsync from '@aws-cdk/aws-appsync-alpha';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { CfnOutput } from 'aws-cdk-lib/core';
 
 export class EnimerosiStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -67,6 +69,52 @@ export class EnimerosiStack extends Stack {
           ],
         }
       ],
+    });
+
+    // Lambda that processes `getNotifications` queries from graphql
+    const getNotificationLambda = new NodejsFunction(this, 'GetNotifications', {
+      runtime: lambda.Runtime.NODEJS_16_X,
+      handler: 'main',
+      entry: path.join(__dirname, "/../get-notifications-lambda/index.ts"),
+      environment: {
+        "threadDb": threadDb.tableName,
+      },
+      bundling: {
+        minify: true,
+        externalModules: ['aws-sdk'],
+      },
+      timeout: Duration.seconds(10), // dynamodb requests can be time consuming
+      tracing: lambda.Tracing.ACTIVE,
+    });
+    emailsBucket.grantRead(fn);
+    threadDb.grantReadData(fn);
+
+    // AppSync API definition for graphql
+    const threadApi = new appsync.GraphqlApi(this, 'threadApi', {
+      name: 'thread-api',
+      schema: appsync.Schema.fromAsset(path.join(__dirname, '/../graphql/enimerosi.graphql')),
+      authorizationConfig: {
+        defaultAuthorization: {
+          authorizationType: appsync.AuthorizationType.IAM,
+        },
+      },
+      xrayEnabled: true,
+    });
+    const threadDbDataSource = threadApi.addDynamoDbDataSource('threadDbDataSource', threadDb);
+    threadDbDataSource.createResolver({
+      typeName: 'Query',
+      fieldName: 'getThreads',
+      requestMappingTemplate: appsync.MappingTemplate.dynamoDbQuery(appsync.KeyCondition.eq("notificationIndex", "0")),
+      responseMappingTemplate: appsync.MappingTemplate.dynamoDbResultList(),
+    });
+    const getNotificationLambdaDataSource = threadApi.addLambdaDataSource('getNotificationLambdaDataSource', getNotificationLambda, {
+
+    });
+    getNotificationLambdaDataSource.createResolver({
+      typeName: 'Query',
+      fieldName: 'getNotifications',
+      requestMappingTemplate: appsync.MappingTemplate.lambdaRequest(),
+      responseMappingTemplate: appsync.MappingTemplate.lambdaResult(),
     });
   }
 }
