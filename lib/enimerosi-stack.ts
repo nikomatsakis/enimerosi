@@ -55,7 +55,7 @@ export class EnimerosiStack extends Stack {
     });
     emailsBucket.grantRead(processEmailLambda);
     threadDb.grantReadWriteData(processEmailLambda);
-    notificationsDb.gdrantReadWriteData(processEmailLambda);
+    notificationsDb.grantReadWriteData(processEmailLambda);
     emailsBucket.addObjectCreatedNotification(new s3n.LambdaDestination(processEmailLambda));
 
     // Simple Email Service that receives notifications from github,

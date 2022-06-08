@@ -2,13 +2,16 @@ import { Context, S3Event } from 'aws-lambda';
 import { S3, DynamoDB } from 'aws-sdk';
 import { GithubEmailNotification, ThreadRecord, updateThreadRecord, NotificationRecord, tokenize } from 'enimerosi-ts-lib/src'; // "/src"??
 
+const ddb = new DynamoDB.DocumentClient();
+const s3 = new S3({});
+const threadDbTableName: string = process.env.threadDb!;
+const notificationsDbTableName: string = process.env.notificationsDb!;
+
 export async function main(event: S3Event, context: Context): Promise<any> {
     console.log({
         level: "debug",
         event,
     });
-
-    let s3 = new S3({});
 
     for (let record of event.Records) {
         let bucket = record.s3.bucket.name;
@@ -69,11 +72,9 @@ export async function main(event: S3Event, context: Context): Promise<any> {
 };
 
 export async function fetchDbThread(notification: GithubEmailNotification): Promise<ThreadRecord | undefined> {
-    let ddb = new DynamoDB.DocumentClient();
-    let tableName: string = process.env.threadDb!;
     let parameters = {
-        TableName: tableName,
-        Key: { threadId: notification.threadId.idString, notificationIndex: 0 },
+        TableName: threadDbTableName,
+        Key: { threadId: notification.threadId.idString },
     };
     console.log({
         level: "debug",
@@ -89,8 +90,6 @@ export async function fetchDbThread(notification: GithubEmailNotification): Prom
 }
 
 export async function tryStoreDbThreadAndNotification(token: string, oldDbThread: ThreadRecord | undefined, newDbThread: ThreadRecord, newDbNotification: NotificationRecord): Promise<boolean> {
-    let tableName: string = process.env.threadDb!;
-
     console.log({
         level: "debug",
         note: "tryStoreDbThreadAndNotification() invoked",
@@ -98,7 +97,7 @@ export async function tryStoreDbThreadAndNotification(token: string, oldDbThread
         oldDbThread,
         newDbThread,
         newDbNotification,
-        tableName,
+        threadDbTableName,
     });
 
     let ddb = new DynamoDB.DocumentClient();
@@ -107,14 +106,14 @@ export async function tryStoreDbThreadAndNotification(token: string, oldDbThread
         ? {
             Put: {
                 Item: newDbThread,
-                TableName: tableName,
+                TableName: threadDbTableName,
                 ConditionExpression: "attribute_not_exists(maxNotificationIndex)",
             }
         }
         : {
             Put: {
                 Item: newDbThread,
-                TableName: tableName,
+                TableName: threadDbTableName,
                 ConditionExpression: "maxNotificationIndex = :maxNotificationIndex",
                 ExpressionAttributeValues: { ":maxNotificationIndex": oldDbThread.maxNotificationIndex },
             }
@@ -127,7 +126,7 @@ export async function tryStoreDbThreadAndNotification(token: string, oldDbThread
             {
                 Put: {
                     Item: newDbNotification,
-                    TableName: tableName,
+                    TableName: notificationsDbTableName,
                     ConditionExpression: "attribute_not_exists(notificationIndex)",
                 }
             },
