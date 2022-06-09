@@ -79,7 +79,6 @@ function updateThreadRecordWithOtherNotification(notification: GithubNotificatio
 function createNewThreadRecord(notification: GithubNotification): db.ThreadRecord {
     return {
         threadId: notification.threadId.idString,
-        notificationIndex: 0,
         maxNotificationIndex: 0,
         mentionedByMe: [],
     };

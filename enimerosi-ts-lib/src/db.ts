@@ -7,9 +7,6 @@ export interface ThreadRecord {
     /// Thread-id from `ThreadId.toString()`.
     threadId: string;
 
-    /// The 0th index is the "thread record".
-    notificationIndex: 0;
-
     /// Begins at 0, incremented by 1 for each new notification we receive.
     maxNotificationIndex: NotificationIndex;
 
@@ -32,12 +29,12 @@ export interface ThreadRecord {
 
 export type NotificationIndex = number;
 
-/// The *second* records for a thread records metadata about each notification.
+/// Records in the notification database, one per email message.
 export interface NotificationRecord {
     /// Thread-id from `ThreadId.toString()`.
     threadId: string;
 
-    /// Index must be some number in `1 ..= maxNotificationIndex` (where `maxNotificationIndex` comes from the `ThreadRecord`).
+    /// Index must be some number in `0 .. maxNotificationIndex` (where `maxNotificationIndex` comes from the `ThreadRecord`).
     notificationIndex: number;
 
     /// For now, the only kind of notifications we receive are github emails.
