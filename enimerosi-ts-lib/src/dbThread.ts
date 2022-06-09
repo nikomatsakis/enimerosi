@@ -20,7 +20,7 @@ export function updateThreadRecord(oldThreadRecord: db.ThreadRecord | undefined,
     let newThreadRecord = cloneThreadRecord(oldThreadRecord);
     newThreadRecord.numNotifications += 1;
 
-    let notificationIndex = newThreadRecord.numNotifications;
+    let notificationIndex = oldThreadRecord.numNotifications;
 
     if (notification.recipient == notification.sender) {
         updateThreadRecordWithMyNotification(notification, newThreadRecord, notificationIndex);

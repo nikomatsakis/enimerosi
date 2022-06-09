@@ -38,7 +38,7 @@ export async function main(event: S3Event, context: Context): Promise<any> {
                 let newDbThread = updateThreadRecord(dbThread, notification);
                 let newDbNotification: NotificationRecord = {
                     threadId: notification.threadId.idString,
-                    notificationIndex: newDbThread.numNotifications,
+                    notificationIndex: newDbThread.numNotifications - 1,
                     notificationType: "email",
                     bucket,
                     key: messageId,

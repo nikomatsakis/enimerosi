@@ -115,7 +115,7 @@ export class EnimerosiStack extends Stack {
     threadDbDataSource.createResolver({
       typeName: 'Query',
       fieldName: 'getThreads',
-      requestMappingTemplate: appsync.MappingTemplate.dynamoDbQuery(appsync.KeyCondition.eq("notificationIndex", "0")),
+      requestMappingTemplate: appsync.MappingTemplate.dynamoDbScanTable(),
       responseMappingTemplate: appsync.MappingTemplate.dynamoDbResultList(),
     });
     const getNotificationLambdaDataSource = threadApi.addLambdaDataSource('getNotificationLambdaDataSource', getNotificationLambda);

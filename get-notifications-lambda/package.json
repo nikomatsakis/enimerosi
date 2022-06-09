@@ -21,6 +21,7 @@
   "dependencies": {
     "aws-lambda": "^1.0.7",
     "aws-sdk": "^2.1150.0",
+    "enimerosi-ts-lib": "file:../enimerosi-ts-lib",
     "range-seq": "^1.0.0"
   }
 }
