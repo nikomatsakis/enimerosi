@@ -15,11 +15,11 @@ test('Email: mentions', async () => {
     let t2 = dbThread.updateThreadRecord(t1, prCommentNotification);
 
     expect(t1.threadId).toBe("salsa-rs/salsa/pull/302");
-    expect(t1.maxNotificationIndex).toBe(1);
+    expect(t1.numNotifications).toBe(1);
     expect(t1.lastCommented).toBe(undefined);
 
     expect(t2.threadId).toBe("salsa-rs/salsa/pull/302");
-    expect(t2.maxNotificationIndex).toBe(2);
+    expect(t2.numNotifications).toBe(2);
     expect(t2.lastCommented).toBe(undefined);
 });
 
@@ -33,10 +33,10 @@ test('Email: Review approved', async () => {
     let t2 = dbThread.updateThreadRecord(t1, emailNotification);
 
     expect(t1.threadId).toBe("salsa-rs/salsa/pull/275");
-    expect(t1.maxNotificationIndex).toBe(1);
+    expect(t1.numNotifications).toBe(1);
     expect(t1.lastCommented).toBe(1);
 
     expect(t2.threadId).toBe("salsa-rs/salsa/pull/275");
-    expect(t2.maxNotificationIndex).toBe(2);
+    expect(t2.numNotifications).toBe(2);
     expect(t2.lastCommented).toBe(2);
 });

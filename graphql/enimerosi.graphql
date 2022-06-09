@@ -31,7 +31,7 @@ type Thread {
     
     Notifications are in the range `0..N` (exclusive).
     """
-    maxNotificationIndex: Int!
+    numNotifications: Int!
 
     """
     If present, index of the last comment by this user

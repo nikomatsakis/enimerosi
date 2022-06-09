@@ -38,7 +38,7 @@ export async function main(event: S3Event, context: Context): Promise<any> {
                 let newDbThread = updateThreadRecord(dbThread, notification);
                 let newDbNotification: NotificationRecord = {
                     threadId: notification.threadId.idString,
-                    notificationIndex: newDbThread.maxNotificationIndex,
+                    notificationIndex: newDbThread.numNotifications,
                     notificationType: "email",
                     bucket,
                     key: messageId,
@@ -107,15 +107,15 @@ export async function tryStoreDbThreadAndNotification(token: string, oldDbThread
             Put: {
                 Item: newDbThread,
                 TableName: threadDbTableName,
-                ConditionExpression: "attribute_not_exists(maxNotificationIndex)",
+                ConditionExpression: "attribute_not_exists(numNotifications)",
             }
         }
         : {
             Put: {
                 Item: newDbThread,
                 TableName: threadDbTableName,
-                ConditionExpression: "maxNotificationIndex = :maxNotificationIndex",
-                ExpressionAttributeValues: { ":maxNotificationIndex": oldDbThread.maxNotificationIndex },
+                ConditionExpression: "numNotifications = :numNotifications",
+                ExpressionAttributeValues: { ":numNotifications": oldDbThread.numNotifications },
             }
         }
     );

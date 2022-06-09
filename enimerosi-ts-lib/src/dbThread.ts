@@ -6,7 +6,7 @@ import assert from "node:assert";
 /// and a new incoming notification, returns a new thread record.
 ///
 /// This new thread-record and the notification record for `notification` should be 
-/// inserted into the database atomically. The index for `notification` is the `maxNotificationIndex`
+/// inserted into the database atomically. The index for `notification` is the `numNotifications`
 /// field in the new thread record.
 ///
 /// Has no side-effects, so if insertion fails (contention), then can be re-run with the new
@@ -18,9 +18,9 @@ export function updateThreadRecord(oldThreadRecord: db.ThreadRecord | undefined,
     assert(oldThreadRecord.threadId === notification.threadId.idString);
 
     let newThreadRecord = cloneThreadRecord(oldThreadRecord);
-    newThreadRecord.maxNotificationIndex += 1;
+    newThreadRecord.numNotifications += 1;
 
-    let notificationIndex = newThreadRecord.maxNotificationIndex;
+    let notificationIndex = newThreadRecord.numNotifications;
 
     if (notification.recipient == notification.sender) {
         updateThreadRecordWithMyNotification(notification, newThreadRecord, notificationIndex);
@@ -79,7 +79,7 @@ function updateThreadRecordWithOtherNotification(notification: GithubNotificatio
 function createNewThreadRecord(notification: GithubNotification): db.ThreadRecord {
     return {
         threadId: notification.threadId.idString,
-        maxNotificationIndex: 0,
+        numNotifications: 0,
         mentionedByMe: [],
     };
 }

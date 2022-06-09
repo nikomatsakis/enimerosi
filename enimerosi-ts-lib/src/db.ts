@@ -8,7 +8,7 @@ export interface ThreadRecord {
     threadId: string;
 
     /// Begins at 0, incremented by 1 for each new notification we receive.
-    maxNotificationIndex: NotificationIndex;
+    numNotifications: NotificationIndex;
 
     /// If set, equal to the highest index of a comment authored by me.
     lastCommented?: NotificationIndex;
@@ -34,7 +34,7 @@ export interface NotificationRecord {
     /// Thread-id from `ThreadId.toString()`.
     threadId: string;
 
-    /// Index must be some number in `0 .. maxNotificationIndex` (where `maxNotificationIndex` comes from the `ThreadRecord`).
+    /// Index must be some number in `0 .. numNotifications` (where `numNotifications` comes from the `ThreadRecord`).
     notificationIndex: number;
 
     /// For now, the only kind of notifications we receive are github emails.
