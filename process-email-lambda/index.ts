@@ -1,9 +1,10 @@
 import { Context, S3Event } from 'aws-lambda';
-import { S3, DynamoDB } from 'aws-sdk';
+import { S3, DynamoDB, AppSync } from 'aws-sdk';
 import { GithubEmailNotification, ThreadRecord, updateThreadRecord, NotificationRecord, tokenize } from 'enimerosi-ts-lib/src'; // "/src"??
 
 const ddb = new DynamoDB.DocumentClient();
 const s3 = new S3({});
+const appsync = new AppSync();
 const threadDbTableName: string = process.env.threadDb!;
 const notificationsDbTableName: string = process.env.notificationsDb!;
 
@@ -147,7 +148,6 @@ export async function tryStoreDbThreadAndNotification(token: string, oldDbThread
             parameters: JSON.stringify(parameters, undefined, 2),
             result: JSON.stringify(result, undefined, 2),
         });
-        return true;
     } catch (error) {
         // Presumably a transaction failure -- I don't know how to check more precisely that this is what it is,
         // could of course also be a network failure of some other kind or something. Maybe it doesn't matter.
@@ -159,6 +159,12 @@ export async function tryStoreDbThreadAndNotification(token: string, oldDbThread
         });
         return false;
     }
+
+    appsync.makeRequest(
+        `mutation MyMutation { updateThread(threadId: "foo") }`,
+        
+    )
+    return true;
 }
 
 function sleep(ms: number) {

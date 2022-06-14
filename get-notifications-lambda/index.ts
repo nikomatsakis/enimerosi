@@ -3,7 +3,6 @@ import { AppSyncResolverHandler } from 'aws-lambda';
 import * as α from './appsync';
 import { S3, DynamoDB } from 'aws-sdk';
 import { GithubEmailNotification, NotificationRecord } from 'enimerosi-ts-lib/src';
-import { BucketNotificationDestinationType } from 'aws-cdk-lib/aws-s3';
 
 const s3 = new S3();
 const ddb = new DynamoDB.DocumentClient();

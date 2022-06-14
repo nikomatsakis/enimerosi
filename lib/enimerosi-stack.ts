@@ -109,6 +109,10 @@ export class EnimerosiStack extends Stack {
           authorizationType: appsync.AuthorizationType.IAM,
         },
       },
+      logConfig: {
+        excludeVerboseContent: false,
+        fieldLogLevel: appsync.FieldLogLevel.ALL,
+      },
       xrayEnabled: true,
     });
     const threadDbDataSource = threadApi.addDynamoDbDataSource('threadDbDataSource', threadDb);
@@ -124,6 +128,19 @@ export class EnimerosiStack extends Stack {
       fieldName: 'getNotifications',
       requestMappingTemplate: appsync.MappingTemplate.lambdaRequest(),
       responseMappingTemplate: appsync.MappingTemplate.lambdaResult(),
+    });
+    const noopDataSource = threadApi.addNoneDataSource("noneDataSource");
+    noopDataSource.createResolver({
+      typeName: 'Mutation',
+      fieldName: 'updateThread',
+      requestMappingTemplate: appsync.MappingTemplate.fromString(`{
+        "version": "2018-05-29",
+        "payload": $util.toJson($context.arguments.threadId)
+      }`),
+      responseMappingTemplate: appsync.MappingTemplate.fromString(`{
+        "version": "2018-05-29",
+        "payload": $util.toJson($context.result)
+      }`),
     });
   }
 }

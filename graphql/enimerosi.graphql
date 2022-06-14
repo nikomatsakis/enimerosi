@@ -1,5 +1,7 @@
 schema {
-    query: Query,
+    query: Query
+    mutation: Mutation
+    subscription: Subscription
 }
     
 type Query {
@@ -10,6 +12,15 @@ type Query {
         startNotificationIndex: Int!,
         endNotificationIndex: Int!
     ): [Notification!]!
+}
+
+type Mutation {
+    updateThread(threadId: String!): String!
+}
+
+type Subscription {
+    updatedThread: String
+    @aws_subscribe(mutations: ["updateThread"])
 }
 
 """
