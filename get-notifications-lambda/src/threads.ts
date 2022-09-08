@@ -3,12 +3,14 @@ import { APIGatewayEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
 import { S3, DynamoDB } from 'aws-sdk';
 import { GithubEmailNotification, NotificationRecord } from 'enimerosi-ts-lib/src';
 
+export { thread_gateway_event };
+
 const s3 = new S3();
 const ddb = new DynamoDB.DocumentClient();
 const threadDbTableName: string = process.env.threadDb!;
 const notificationsDbTableName: string = process.env.notificationsDb!;
 
-export async function main(
+async function thread_gateway_event(
     event: APIGatewayEvent,
     context: Context
 ): Promise<APIGatewayProxyResult> {

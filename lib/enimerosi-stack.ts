@@ -40,7 +40,7 @@ export class EnimerosiStack extends Stack {
 
     // Each message that is delivered will be stored into S3. S3 then
     // invokes this lambda.
-    const processEmailLambda = nodejsfunction(this, "process-email-lambda", "main", {
+    const processEmailLambda = nodejsfunction(this, "get-notifications-lambda", "process_email_event", {
       "threadDb": threadDb.tableName,
       "notificationsDb": notificationsDb.tableName,
     });
@@ -140,7 +140,7 @@ function nodejsfunction(
   handler: string,
   environment: any,
 ): NodejsFunction {
-  return new NodejsFunction(stack, dirname, {
+  return new NodejsFunction(stack, `${dirname}.${handler}`, {
     runtime: lambda.Runtime.NODEJS_16_X,
     handler: handler,
     entry: path.join(__dirname, "/../", dirname, "/index.ts"),
@@ -166,7 +166,7 @@ class EnimerosiApiGateway extends Stack {
     super(scope, id, props);
 
     // API Gateway for REST APIs.
-    const threadListingLambda = nodejsfunction(this, 'thread-listing-lambda', 'main', {
+    const threadListingLambda = nodejsfunction(this, 'get-notifications-lambda', 'thread_gateway_event', {
       "threadDb": threadDb.tableName,
       "notificationsDb": notificationsDb.tableName,
     });
