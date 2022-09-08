@@ -12,6 +12,9 @@
   },
   "author": "Nicholas Matsakis",
   "license": "MIT",
+  "files": [
+    "src/**/*"
+  ],
   "devDependencies": {
     "@graphql-codegen/cli": "2.12.0",
     "@graphql-codegen/typescript": "2.7.3",

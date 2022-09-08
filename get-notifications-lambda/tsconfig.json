@@ -10,7 +10,7 @@
         "forceConsistentCasingInFileNames": true,
         "isolatedModules": true,
         "declaration": true, /* Concatenate & emit output to single file.*/
-        "outDir": "lib",
+        "outDir": "src",
         "strictNullChecks": true,
     },
     "include": [
