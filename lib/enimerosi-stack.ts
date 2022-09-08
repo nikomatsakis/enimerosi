@@ -11,8 +11,10 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as path from 'path';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as appsync from '@aws-cdk/aws-appsync-alpha';
+import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { CfnOutput } from 'aws-cdk-lib/core';
+import { S3 } from 'aws-cdk-lib/aws-ses-actions';
 
 export class EnimerosiStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -38,20 +40,9 @@ export class EnimerosiStack extends Stack {
 
     // Each message that is delivered will be stored into S3. S3 then
     // invokes this lambda.
-    const processEmailLambda = new NodejsFunction(this, 'ProcessEmail', {
-      runtime: lambda.Runtime.NODEJS_16_X,
-      handler: 'main',
-      entry: path.join(__dirname, `/../process-email-lambda/index.ts`),
-      environment: {
-        "threadDb": threadDb.tableName,
-        "notificationsDb": notificationsDb.tableName,
-      },
-      bundling: {
-        minify: true,
-        externalModules: ['aws-sdk'],
-      },
-      timeout: Duration.seconds(10), // dynamodb requests can be time consuming
-      tracing: lambda.Tracing.ACTIVE,
+    const processEmailLambda = nodejsfunction(this, "process-email-lambda", "main", {
+      "threadDb": threadDb.tableName,
+      "notificationsDb": notificationsDb.tableName,
     });
     emailsBucket.grantRead(processEmailLambda);
     threadDb.grantReadWriteData(processEmailLambda);
@@ -80,25 +71,23 @@ export class EnimerosiStack extends Stack {
       ],
     });
 
-    // Lambda that processes `getNotifications` queries from graphql
-    const getNotificationLambda = new NodejsFunction(this, 'GetNotifications', {
-      runtime: lambda.Runtime.NODEJS_16_X,
-      handler: 'main',
-      entry: path.join(__dirname, "/../get-notifications-lambda/index.ts"),
-      environment: {
-        "threadDb": threadDb.tableName,
-        "notificationsDb": notificationsDb.tableName,
-      },
-      bundling: {
-        minify: true,
-        externalModules: ['aws-sdk'],
-      },
-      timeout: Duration.seconds(10), // dynamodb requests can be time consuming
-      tracing: lambda.Tracing.ACTIVE,
+    const getNotificationLambda = nodejsfunction(this, "get-notifications-lambda", "appsync", {
+      "threadDb": threadDb.tableName,
+      "notificationsDb": notificationsDb.tableName,
     });
     emailsBucket.grantRead(getNotificationLambda);
     threadDb.grantReadData(getNotificationLambda);
     notificationsDb.grantReadData(getNotificationLambda);
+
+    // Create the API gateway
+    new EnimerosiApiGateway(
+      this,
+      "EnimerosiApiGateway",
+      props,
+      threadDb,
+      notificationsDb,
+      emailsBucket,
+    );
 
     // AppSync API definition for graphql
     const threadApi = new appsync.GraphqlApi(this, 'threadApi', {
@@ -142,5 +131,80 @@ export class EnimerosiStack extends Stack {
         "payload": $util.toJson($context.result)
       }`),
     });
+  }
+}
+
+function nodejsfunction(
+  stack: Stack,
+  dirname: string,
+  handler: string,
+  environment: any,
+): NodejsFunction {
+  return new NodejsFunction(stack, dirname, {
+    runtime: lambda.Runtime.NODEJS_16_X,
+    handler: handler,
+    entry: path.join(__dirname, "/../", dirname, "/index.ts"),
+    environment,
+    bundling: {
+      minify: true,
+      externalModules: ['aws-sdk'],
+    },
+    timeout: Duration.seconds(10), // dynamodb requests can be time consuming
+    tracing: lambda.Tracing.ACTIVE,
+  });
+}
+
+class EnimerosiApiGateway extends Stack {
+  constructor(
+    scope: Construct,
+    id: string,
+    props: StackProps | undefined,
+    threadDb: dynamodb.Table,
+    notificationsDb: dynamodb.Table,
+    emailsBucket: s3.Bucket,
+  ) {
+    super(scope, id, props);
+
+    // API Gateway for REST APIs.
+    const threadListingLambda = nodejsfunction(this, 'thread-listing-lambda', 'main', {
+      "threadDb": threadDb.tableName,
+      "notificationsDb": notificationsDb.tableName,
+    });
+    emailsBucket.grantRead(threadListingLambda);
+    threadDb.grantReadData(threadListingLambda);
+    notificationsDb.grantReadData(threadListingLambda);
+
+    const notificationsLambda = nodejsfunction(this, 'get-notifications-lambda', 'apigateway', {
+      "threadDb": threadDb.tableName,
+      "notificationsDb": notificationsDb.tableName,
+    });
+    emailsBucket.grantRead(notificationsLambda);
+    threadDb.grantReadData(notificationsLambda);
+    notificationsDb.grantReadData(notificationsLambda);
+
+    const api = new apigateway.RestApi(this, 'enimerosi-api', {
+      restApiName: "Enimerosi Service",
+      description: "Enimerosi API."
+    });
+
+    const threadListingIntegration = new apigateway.LambdaIntegration(threadListingLambda);
+    const notificationsIntegration = new apigateway.LambdaIntegration(notificationsLambda);
+
+    // GET /threads
+    const threads = api.root.addResource('threads');
+    threads.addMethod('GET', threadListingIntegration);
+
+    // GET /threads/{id}
+    //
+    // invokes get-notifications-lambda
+    const thread = threads.addResource('{thread}');
+    thread.addMethod('GET', threadListingIntegration);
+
+    // GET /threads/{id}/{start}/{end}
+    //
+    // invokes get-notifications-lambda
+    const notificationStart = thread.addResource('{start}');
+    const notificationEnd = notificationStart.addResource('{end}');
+    notificationEnd.addMethod('GET', notificationsIntegration);
   }
 }

@@ -1,0 +1,24 @@
+{
+  "name": "api-gateway-lambda",
+  "version": "1.0.0",
+  "description": "API Gateway for Enimerosi",
+  "main": "index.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk"
+  },
+  "author": "Nicholas Matsakis",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.8.2",
+    "@types/aws-lambda": "^8.10.99",
+    "ts-jest": "^28.0.4"
+  },
+  "dependencies": {
+    "aws-lambda": "^1.0.7",
+    "aws-sdk": "^2.1211.0",
+    "enimerosi-ts-lib": "file:../enimerosi-ts-lib"
+  }
+}

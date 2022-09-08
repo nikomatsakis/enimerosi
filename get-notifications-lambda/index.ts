@@ -9,14 +9,49 @@ const ddb = new DynamoDB.DocumentClient();
 const threadDbTableName: string = process.env.threadDb!;
 const notificationsDbTableName: string = process.env.notificationsDb!;
 
-export async function main(event: AppSyncResolverHandler<α.QueryGetNotificationsArgs, Array<α.Notification>>, context: λ.Context): Promise<Array<α.Notification>> {
+export async function appsync(event: AppSyncResolverHandler<α.QueryGetNotificationsArgs, Array<α.Notification>>, context: λ.Context): Promise<Array<α.Notification>> {
     console.log({
         level: "debug",
         event,
     });
 
     let { startNotificationIndex, endNotificationIndex, threadId }: α.QueryGetNotificationsArgs = event.arguments;
+    return await main(threadId, startNotificationIndex, endNotificationIndex);
+}
 
+export async function apigateway(
+    event: λ.APIGatewayEvent,
+    context: λ.Context
+): Promise<λ.APIGatewayProxyResult> {
+    interface NotificationsParameters {
+        thread: string,
+        start: string,
+        end: string,
+    }
+
+    let parameters: NotificationsParameters = <any>event.pathParameters;
+    let thread = decodeURIComponent(parameters.thread);
+    let start = Number.parseInt(parameters.start);
+    let end = Number.parseInt(parameters.end);
+    let notifications = await main(thread, start, end);
+
+    return {
+        statusCode: 200,
+        body: JSON.stringify(notifications)
+    };
+}
+
+async function main(
+    threadId: string,
+    startNotificationIndex: number,
+    endNotificationIndex: number,
+): Promise<Array<α.Notification>> {
+    console.log({
+        level: "debug",
+        threadId,
+        startNotificationIndex,
+        endNotificationIndex,
+    });
     let params: DynamoDB.DocumentClient.BatchGetItemInput = {
         RequestItems: {
             [notificationsDbTableName]: {
@@ -33,7 +68,7 @@ export async function main(event: AppSyncResolverHandler<α.QueryGetNotification
     let responses: DynamoDB.DocumentClient.BatchGetItemOutput = await ddb.batchGet(params).promise();
     console.log({
         level: "debug",
-        params,
+        params: JSON.stringify(params, undefined, 2),
         responses: JSON.stringify(responses, undefined, 2),
     });
     let results = [];
