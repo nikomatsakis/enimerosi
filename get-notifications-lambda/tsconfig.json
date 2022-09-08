@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "target": "es2020",
+        "strict": true,
+        "preserveConstEnums": true,
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "isolatedModules": true,
+        "declaration": true, /* Concatenate & emit output to single file.*/
+        "outDir": "lib",
+        "strictNullChecks": true,
+    },
+    "include": [
+        "index.ts",
+        "src",
+        "tests"
+    ],
+    "exclude": [
+        "node_modules",
+        "**/*.test.ts"
+    ]
+}

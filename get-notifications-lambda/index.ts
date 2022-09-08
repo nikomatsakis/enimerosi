@@ -1,6 +1,6 @@
 import * as λ from 'aws-lambda';
 import { AppSyncResolverHandler } from 'aws-lambda';
-import * as α from './appsync';
+import * as γ from './src/generated/graphql';
 import { S3, DynamoDB } from 'aws-sdk';
 import { GithubEmailNotification, NotificationRecord } from 'enimerosi-ts-lib/src';
 
@@ -9,13 +9,13 @@ const ddb = new DynamoDB.DocumentClient();
 const threadDbTableName: string = process.env.threadDb!;
 const notificationsDbTableName: string = process.env.notificationsDb!;
 
-export async function appsync(event: AppSyncResolverHandler<α.QueryGetNotificationsArgs, Array<α.Notification>>, context: λ.Context): Promise<Array<α.Notification>> {
+export async function appsync(event: AppSyncResolverHandler<γ.QueryGetNotificationsArgs, Array<γ.Notification>>, context: λ.Context): Promise<Array<γ.Notification>> {
     console.log({
         level: "debug",
         event,
     });
 
-    let { startNotificationIndex, endNotificationIndex, threadId }: α.QueryGetNotificationsArgs = event.arguments;
+    let { startNotificationIndex, endNotificationIndex, threadId }: γ.QueryGetNotificationsArgs = event.arguments;
     return await main(threadId, startNotificationIndex, endNotificationIndex);
 }
 
@@ -45,7 +45,7 @@ async function main(
     threadId: string,
     startNotificationIndex: number,
     endNotificationIndex: number,
-): Promise<Array<α.Notification>> {
+): Promise<Array<γ.Notification>> {
     console.log({
         level: "debug",
         threadId,
