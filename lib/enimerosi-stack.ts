@@ -184,17 +184,23 @@ class EnimerosiApiGateway extends Stack {
     const threads = api.root.addResource('threads');
     threads.addMethod('GET', lambdaIntegration);
 
-    // GET /threads/{id}
-    //
-    // invokes get-notifications-lambda
-    const thread = threads.addResource('{thread}');
-    thread.addMethod('GET', lambdaIntegration);
+    // GET /threads/{startKey}
+    const withStartKey = threads.addResource('{startKey}');
+    withStartKey.addMethod('GET', lambdaIntegration);
 
-    // GET /threads/{id}/{start}/{end}
+    // GET /thread/{thread}
     //
     // invokes get-notifications-lambda
-    const notificationStart = thread.addResource('{start}');
-    const notificationEnd = notificationStart.addResource('{end}');
-    notificationEnd.addMethod('GET', lambdaIntegration);
+    api.root.addResource('thread').addResource('{thread}')
+      .addMethod('GET', lambdaIntegration);
+
+    // GET /notifications/{thread}/{start}/{end}
+    //
+    // invokes get-notifications-lambda
+    api.root.addResource('notifications')
+      .addResource('{thread}')
+      .addResource('{start}')
+      .addResource('{end}')
+      .addMethod('GET', lambdaIntegration);
   }
 }

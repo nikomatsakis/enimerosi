@@ -3,6 +3,7 @@ import { APIGatewayEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
 import { S3, DynamoDB } from 'aws-sdk';
 import { GithubEmailNotification, NotificationRecord } from 'enimerosi-ts-lib/src';
 import { fetch_notifications } from './notifications';
+import { allThreads } from './threads';
 
 export { api_gateway_event };
 
@@ -22,8 +23,9 @@ async function api_gateway_event(
     });
     switch (event.resource) {
         case "/threads": return getThreads(event, context);
-        case "/threads/{thread}": return getThread(event, context);
-        case "/threads/{thread}/{start}/{end}": return getNotifications(event, context);
+        case "/threads/{startKey}": return getThreads(event, context);
+        case "/thread/{thread}": return getThread(event, context);
+        case "/notifications/{thread}/{start}/{end}": return getNotifications(event, context);
         default: throw new Error(`unrecognized resource ${event.resource}`);
     }
 }
@@ -32,10 +34,21 @@ async function getThreads(
     event: APIGatewayEvent,
     context: Context
 ): Promise<APIGatewayProxyResult> {
-    let responseBody = {
-        message: "hi",
-        input: event
-    };
+    interface Parameters {
+        startKey?: string
+    }
+
+    // If the user writes `/threads`, then `pathParameters` is null.
+    let startKey = (event.pathParameters === null
+        ? undefined
+        : event.pathParameters.startKey);
+
+    let responseBody = await allThreads(startKey);
+
+    console.log({
+        level: "debug",
+        responseBody: JSON.stringify(responseBody, undefined, 2)
+    });
 
     return {
         statusCode: 200,
