@@ -20,6 +20,10 @@ export function updateThreadRecord(oldThreadRecord: db.ThreadRecord | undefined,
     let newThreadRecord = cloneThreadRecord(oldThreadRecord);
     newThreadRecord.numNotifications += 1;
 
+    // subject lines change sometimes -- e.g., if the title of the issue is updated or
+    // if we fix a bug -- so take the newer one.
+    newThreadRecord.subject = notification.subject;
+
     let notificationIndex = oldThreadRecord.numNotifications;
 
     if (notification.recipient == notification.sender) {
