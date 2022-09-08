@@ -3,7 +3,7 @@ import { APIGatewayEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
 import { S3, DynamoDB } from 'aws-sdk';
 import { GithubEmailNotification, NotificationRecord } from 'enimerosi-ts-lib/src';
 import { fetch_notifications } from './notifications';
-import { allThreads } from './threads';
+import { allThreads, getThreadData } from './threads';
 
 export { api_gateway_event };
 
@@ -64,11 +64,10 @@ async function getThread(
         thread: string
     }
 
-    let { thread } = <ThreadParameters><any>event.pathParameters;
+    let parameters = <ThreadParameters><any>event.pathParameters;
+    let thread = decodeURIComponent(parameters.thread);
 
-    let responseBody = {
-        thread
-    };
+    let responseBody = await getThreadData(thread);
 
     return {
         statusCode: 200,

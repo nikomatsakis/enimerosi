@@ -46,3 +46,29 @@ export async function allThreads(
 
     return result;
 }
+
+export async function getThreadData(
+    threadId: string
+): Promise<γ.Thread> {
+    console.log({
+        level: "debug",
+        message: "getThreadData",
+        threadId,
+    });
+
+    let getInput: DynamoDB.DocumentClient.GetItemInput = {
+        TableName: threadDbTableName,
+        Key: { threadId },
+
+    };
+    console.log({
+        level: "debug",
+        scanInput: JSON.stringify(getInput, undefined, 2),
+    });
+    let getOutput: DynamoDB.DocumentClient.GetItemOutput = await ddb.get(getInput).promise();
+    console.log({
+        level: "debug",
+        scanOutput: JSON.stringify(getOutput, undefined, 2),
+    });
+    return getOutput.Item as γ.Thread;
+}
