@@ -10,6 +10,7 @@ const appsync = new AppSync();
 const threadDbTableName: string = process.env.threadDb!;
 const notificationsDbTableName: string = process.env.notificationsDb!;
 
+// Email with github notification received
 async function process_email_event(event: S3Event, context: Context): Promise<any> {
     console.log({
         level: "debug",

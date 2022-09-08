@@ -1,50 +1,15 @@
 import * as λ from 'aws-lambda';
 import { AppSyncResolverHandler } from 'aws-lambda';
-import * as γ from './src/generated/graphql';
+import * as γ from './generated/graphql';
 import { S3, DynamoDB } from 'aws-sdk';
 import { GithubEmailNotification, NotificationRecord } from 'enimerosi-ts-lib/src';
-
-export { appsync, apigateway };
 
 const s3 = new S3();
 const ddb = new DynamoDB.DocumentClient();
 const threadDbTableName: string = process.env.threadDb!;
 const notificationsDbTableName: string = process.env.notificationsDb!;
 
-async function appsync(event: AppSyncResolverHandler<γ.QueryGetNotificationsArgs, Array<γ.Notification>>, context: λ.Context): Promise<Array<γ.Notification>> {
-    console.log({
-        level: "debug",
-        event,
-    });
-
-    let { startNotificationIndex, endNotificationIndex, threadId }: γ.QueryGetNotificationsArgs = event.arguments;
-    return await main(threadId, startNotificationIndex, endNotificationIndex);
-}
-
-
-async function apigateway(
-    event: λ.APIGatewayEvent,
-    context: λ.Context
-): Promise<λ.APIGatewayProxyResult> {
-    interface NotificationsParameters {
-        thread: string,
-        start: string,
-        end: string,
-    }
-
-    let parameters: NotificationsParameters = <any>event.pathParameters;
-    let thread = decodeURIComponent(parameters.thread);
-    let start = Number.parseInt(parameters.start);
-    let end = Number.parseInt(parameters.end);
-    let notifications = await main(thread, start, end);
-
-    return {
-        statusCode: 200,
-        body: JSON.stringify(notifications)
-    };
-}
-
-async function main(
+export async function fetch_notifications(
     threadId: string,
     startNotificationIndex: number,
     endNotificationIndex: number,
