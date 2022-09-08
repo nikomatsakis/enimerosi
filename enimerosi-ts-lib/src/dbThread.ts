@@ -81,6 +81,7 @@ function createNewThreadRecord(notification: GithubNotification): db.ThreadRecor
         threadId: notification.threadId.idString,
         numNotifications: 0,
         mentionedByMe: [],
+        subject: notification.subject,
     };
 }
 

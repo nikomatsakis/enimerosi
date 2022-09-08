@@ -3,7 +3,7 @@ import * as mailparser from "mailparser";
 import { GithubNotification, Reason, parseReason, LinkData, ViewAction } from "./notification";
 import assert from "node:assert";
 import { Mention, UserMention, TeamMention } from "./mention";
-import { ThreadId, parseGithubEmailMessageId } from "./thread";
+import { ThreadId, parseGithubEmailMessageId, GithubThreadId } from "./thread";
 import sanitize from "sanitize-html";
 
 /// A notification derived from a Github email.
@@ -61,10 +61,33 @@ export class GithubEmailNotification implements GithubNotification {
         return mentions;
     }
 
-    get threadId(): ThreadId {
+    get threadId(): GithubThreadId {
         let messageId = this.parsedMail.messageId;
         assert(messageId !== undefined);
         return parseGithubEmailMessageId(messageId.toString());
+    }
+
+    get subject(): string {
+        // github email subject lines look like:
+        //
+        // [rust-lang/rust] Commit to safety rules for dyn trait upcasting (Issue #101336)
+        //
+        // or
+        //
+        // Re: [rust-lang/rust] Commit to safety rules for dyn trait upcasting (Issue #101336)
+        //
+        // We want to strip out the `[rust-lang/rust]` part. We can get the name of org/repo
+        // from the thread-id.
+        let threadId = this.threadId;
+        let tag = `[${threadId.org}/${threadId.repo}] `;
+        let subject = this.parsedMail.subject || "";
+        let position = subject.indexOf(tag);
+        if (position > 0) {
+            return subject.slice(position + tag.length);
+        } else {
+            return subject;
+        }
+
     }
 
     get linkData(): LinkData | undefined {

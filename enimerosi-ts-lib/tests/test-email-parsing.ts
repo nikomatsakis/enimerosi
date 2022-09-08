@@ -8,6 +8,12 @@ test('Email 1: thread-id', async () => {
     expect(notification.threadId.idString).toBe('rust-lang/compiler-team/issues/512');
 });
 
+test('Email 1: subject', async () => {
+    let emailText = await readFile(join(__dirname, "/test-issue-comment.eml"), { encoding: "utf8" });
+    let notification = await GithubEmailNotification.fromMailText(emailText);
+    expect(notification.subject).toBe('Change compiletest declarations parsing (Issue #512)');
+});
+
 test('Email 1: mentions', async () => {
     let emailText = await readFile(join(__dirname, "/test-issue-comment.eml"), { encoding: "utf8" });
     let notification = await GithubEmailNotification.fromMailText(emailText);

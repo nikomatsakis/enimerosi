@@ -18,8 +18,15 @@ export interface GithubNotification {
     /// All mentions in the body of this notification.
     get mentions(): Array<Mention>;
 
-    /// The thread-id identifies 
+    /// The thread-id identifier
     get threadId(): ThreadId;
+
+    /// The "subject" is a human readable string that describes the thread.
+    /// It is supposed to be the same for all notifications in the same thread, but not strictly *required* to be the same.
+    /// We capture the subject line from the first notification that we see with a given thread-id.
+    ///
+    /// (I'm not aware of any cases where it would be different, though. --nikomatsakis)
+    get subject(): string;
 
     /// Link-data (if any) included in the email
     linkData: LinkData | undefined;

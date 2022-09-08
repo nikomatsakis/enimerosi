@@ -7,6 +7,9 @@ export interface ThreadRecord {
     /// Thread-id from `ThreadId.toString()`.
     threadId: string;
 
+    /// Subject of the thread -- human readable text summarizing what its about
+    subject: string;
+
     /// Begins at 0, incremented by 1 for each new notification we receive.
     numNotifications: NotificationIndex;
 

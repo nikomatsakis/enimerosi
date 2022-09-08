@@ -23,6 +23,12 @@ test('Email: mentions', async () => {
     expect(t2.lastCommented).toBe(undefined);
 });
 
+test('Email: Subject line with Re:', async () => {
+    let emailText = await readFile(join(__dirname, "/salsa-new-commits.eml"), { encoding: "utf8" });
+    let emailNotification = await GithubEmailNotification.fromMailText(emailText);
+    expect(emailNotification.subject).toBe("Expose the ability to remove the value from an input query, taking ownership of the value (#275)");
+});
+
 test('Email: Review approved', async () => {
     let emailText = await readFile(join(__dirname, "/salsa-review-approved.eml"), { encoding: "utf8" });
     let emailNotification = await GithubEmailNotification.fromMailText(emailText);
@@ -34,9 +40,9 @@ test('Email: Review approved', async () => {
 
     expect(t1.threadId).toBe("salsa-rs/salsa/pull/275");
     expect(t1.numNotifications).toBe(1);
-    expect(t1.lastCommented).toBe(1);
+    expect(t1.lastCommented).toBe(0);
 
     expect(t2.threadId).toBe("salsa-rs/salsa/pull/275");
     expect(t2.numNotifications).toBe(2);
-    expect(t2.lastCommented).toBe(2);
+    expect(t2.lastCommented).toBe(1);
 });

@@ -27,7 +27,7 @@ export class GithubThreadId implements ThreadId {
 type ThreadKind = "issues" | "pull";
 
 /// Given the contents of the `In-Reply-To` header, return a thread-id.
-export function parseGithubEmailMessageId(messageId: string): ThreadId {
+export function parseGithubEmailMessageId(messageId: string): GithubThreadId {
     // Example: `<rust-lang/compiler-team/issues/512/1141006298@github.com>`
     let issuesRegex = /<([^/]*)\/([^/]*)\/issues\/([0-9]*)(\/[^@]*)?@github.com>/;
     let match = issuesRegex.exec(messageId);
