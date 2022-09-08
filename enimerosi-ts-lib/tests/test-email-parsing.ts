@@ -86,3 +86,10 @@ test('salsa-new-commits', async () => {
         }, undefined, 2)
     );
 });
+
+
+test('rust-lang-rust-issue: subject', async () => {
+    let emailText = await readFile(join(__dirname, "/rust-lang-rust-issue.eml"), { encoding: "utf8" });
+    let notification = await GithubEmailNotification.fromMailText(emailText);
+    expect(notification.subject).toBe('Commit to safety rules for dyn trait upcasting (Issue #101336)');
+});

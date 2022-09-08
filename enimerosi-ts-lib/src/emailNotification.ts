@@ -82,7 +82,7 @@ export class GithubEmailNotification implements GithubNotification {
         let tag = `[${threadId.org}/${threadId.repo}] `;
         let subject = this.parsedMail.subject || "";
         let position = subject.indexOf(tag);
-        if (position > 0) {
+        if (position >= 0) {
             return subject.slice(position + tag.length);
         } else {
             return subject;
