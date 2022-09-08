@@ -80,10 +80,7 @@ export class EnimerosiStack extends Stack {
     notificationsDb.grantReadData(getNotificationLambda);
 
     // Create the API gateway
-    new EnimerosiApiGateway(
-      this,
-      "EnimerosiApiGateway",
-      props,
+    this.setupApigateway(
       threadDb,
       notificationsDb,
       emailsBucket,
@@ -132,38 +129,12 @@ export class EnimerosiStack extends Stack {
       }`),
     });
   }
-}
 
-function nodejsfunction(
-  stack: Stack,
-  handler: string,
-  environment: any,
-): NodejsFunction {
-  return new NodejsFunction(stack, `lambda-${handler}`, {
-    runtime: lambda.Runtime.NODEJS_16_X,
-    handler: handler,
-    entry: path.join(__dirname, "/../lambda/index.ts"),
-    environment,
-    bundling: {
-      minify: true,
-      externalModules: ['aws-sdk'],
-    },
-    timeout: Duration.seconds(10), // dynamodb requests can be time consuming
-    tracing: lambda.Tracing.ACTIVE,
-  });
-}
-
-class EnimerosiApiGateway extends Stack {
-  constructor(
-    scope: Construct,
-    id: string,
-    props: StackProps | undefined,
+  setupApigateway(
     threadDb: dynamodb.Table,
     notificationsDb: dynamodb.Table,
     emailsBucket: s3.Bucket,
   ) {
-    super(scope, id, props);
-
     // API Gateway for REST APIs.
     const lambda = nodejsfunction(this, 'api_gateway_event', {
       "threadDb": threadDb.tableName,
@@ -203,4 +174,23 @@ class EnimerosiApiGateway extends Stack {
       .addResource('{end}')
       .addMethod('GET', lambdaIntegration);
   }
+}
+
+function nodejsfunction(
+  stack: Stack,
+  handler: string,
+  environment: any,
+): NodejsFunction {
+  return new NodejsFunction(stack, `lambda-${handler}`, {
+    runtime: lambda.Runtime.NODEJS_16_X,
+    handler: handler,
+    entry: path.join(__dirname, "/../lambda/index.ts"),
+    environment,
+    bundling: {
+      minify: true,
+      externalModules: ['aws-sdk'],
+    },
+    timeout: Duration.seconds(10), // dynamodb requests can be time consuming
+    tracing: lambda.Tracing.ACTIVE,
+  });
 }
