@@ -1,7 +1,7 @@
 import { Context, S3Event } from 'aws-lambda';
 import { S3, DynamoDB, AppSync } from 'aws-sdk';
 import { GithubEmailNotification, ThreadRecord, updateThreadRecord, NotificationRecord, tokenize } from 'enimerosi-ts-lib/src'; // "/src"??
-
+import { getThreadData } from "./threads";
 export { process_email_event };
 
 const ddb = new DynamoDB.DocumentClient();
@@ -38,7 +38,7 @@ async function process_email_event(event: S3Event, context: Context): Promise<an
             });
             let counter = 0;
             while (true) {
-                let dbThread = await fetchDbThread(notification);
+                let dbThread = await getThreadData(notification.threadId.idString);
                 let newDbThread = updateThreadRecord(dbThread, notification);
                 let newDbNotification: NotificationRecord = {
                     threadId: notification.threadId.idString,
@@ -74,24 +74,6 @@ async function process_email_event(event: S3Event, context: Context): Promise<an
 
     return {};
 };
-
-export async function fetchDbThread(notification: GithubEmailNotification): Promise<ThreadRecord | undefined> {
-    let parameters = {
-        TableName: threadDbTableName,
-        Key: { threadId: notification.threadId.idString },
-    };
-    console.log({
-        level: "debug",
-        note: "fetching thread from dynamodb",
-        parameters,
-    });
-    let response = await ddb.get(parameters).promise();
-    if (response.Item === null) {
-        return undefined;
-    }
-    let json = response.Item;
-    return json as ThreadRecord; // ??
-}
 
 export async function tryStoreDbThreadAndNotification(token: string, oldDbThread: ThreadRecord | undefined, newDbThread: ThreadRecord, newDbNotification: NotificationRecord): Promise<boolean> {
     console.log({

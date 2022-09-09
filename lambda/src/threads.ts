@@ -1,12 +1,12 @@
 import * as λ from 'aws-lambda';
-import * as γ from './generated/graphql';
 import { S3, DynamoDB } from 'aws-sdk';
+import { ThreadRecord } from 'enimerosi-ts-lib/src'; // "/src"??
 
 const ddb = new DynamoDB.DocumentClient();
 const threadDbTableName: string = process.env.threadDb!;
 
 interface AllThreadsResult {
-    threads: Array<γ.Thread>,
+    threads: Array<ThreadRecord>,
     nextPage?: string
 }
 
@@ -32,7 +32,7 @@ export async function allThreads(
         scanOutput: JSON.stringify(scanOutput, undefined, 2),
     });
     let result: AllThreadsResult = {
-        threads: scanOutput.Items! as Array<γ.Thread>,
+        threads: scanOutput.Items! as Array<ThreadRecord>,
     };
 
     if (scanOutput.LastEvaluatedKey) {
@@ -49,26 +49,14 @@ export async function allThreads(
 
 export async function getThreadData(
     threadId: string
-): Promise<γ.Thread> {
-    console.log({
-        level: "debug",
-        message: "getThreadData",
-        threadId,
-    });
-
+): Promise<ThreadRecord | undefined> {
     let getInput: DynamoDB.DocumentClient.GetItemInput = {
         TableName: threadDbTableName,
         Key: { threadId },
 
     };
-    console.log({
-        level: "debug",
-        scanInput: JSON.stringify(getInput, undefined, 2),
-    });
     let getOutput: DynamoDB.DocumentClient.GetItemOutput = await ddb.get(getInput).promise();
-    console.log({
-        level: "debug",
-        scanOutput: JSON.stringify(getOutput, undefined, 2),
-    });
-    return getOutput.Item as γ.Thread;
+    if (getOutput.Item === null)
+        return undefined;
+    return getOutput.Item as ThreadRecord;
 }
