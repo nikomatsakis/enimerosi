@@ -38,6 +38,14 @@ type Thread {
     threadId: String!
 
     """
+    The "subject" is a human-readable description of this thread.
+    It is taken from the GH email subjects.
+
+    e.g., "Consider porting to a new backend (Issue #123)"
+    """
+    subject: String!
+
+    """
     Maximum notification index `N` for this thread.
     
     Notifications are in the range `0..N` (exclusive).
