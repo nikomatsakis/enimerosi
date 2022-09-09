@@ -2,7 +2,7 @@ import * as λ from 'aws-lambda';
 import { APIGatewayEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
 import { S3, DynamoDB } from 'aws-sdk';
 import { GithubEmailNotification, NotificationRecord } from 'enimerosi-ts-lib/src';
-import { fetch_notifications } from './notifications';
+import { fetch_notifications, notificationViewUrl } from './notifications';
 import { allThreads, getThreadData } from './threads';
 
 export { api_gateway_event };
@@ -26,6 +26,7 @@ async function api_gateway_event(
         case "/threads/{startKey}": return getThreads(event, context);
         case "/thread/{thread}": return getThread(event, context);
         case "/notifications/{thread}/{start}/{end}": return getNotifications(event, context);
+        case "/view/{thread}/{index}": return viewNotification(event, context);
         default: throw new Error(`unrecognized resource ${event.resource}`);
     }
 }
@@ -94,5 +95,30 @@ async function getNotifications(
     return {
         statusCode: 200,
         body: JSON.stringify(notifications)
+    };
+}
+
+async function viewNotification(
+    event: APIGatewayEvent,
+    context: Context
+): Promise<APIGatewayProxyResult> {
+    interface Parameters {
+        thread: string,
+        index: string,
+    }
+
+    let parameters: Parameters = <any>event.pathParameters;
+    let thread = decodeURIComponent(parameters.thread);
+    let index = Number.parseInt(parameters.index);
+    let url = await notificationViewUrl(thread, index);
+    if (url === undefined) {
+        throw new Error("no link data for that notification");
+    }
+    return {
+        statusCode: 302,
+        headers: {
+            location: url,
+        },
+        body: `<body>Redirecting to <a href="${url}">${thread}</a></body>`
     };
 }

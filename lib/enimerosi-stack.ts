@@ -160,18 +160,19 @@ export class EnimerosiStack extends Stack {
     withStartKey.addMethod('GET', lambdaIntegration);
 
     // GET /thread/{thread}
-    //
-    // invokes get-notifications-lambda
     api.root.addResource('thread').addResource('{thread}')
       .addMethod('GET', lambdaIntegration);
 
     // GET /notifications/{thread}/{start}/{end}
-    //
-    // invokes get-notifications-lambda
     api.root.addResource('notifications')
       .addResource('{thread}')
       .addResource('{start}')
       .addResource('{end}')
+      .addMethod('GET', lambdaIntegration);
+
+    // GET /view/{thread}/{index}
+    api.root.addResource('view').addResource('{thread}')
+      .addResource("{index}")
       .addMethod('GET', lambdaIntegration);
   }
 }

@@ -68,3 +68,28 @@ async function loadNotification(dbRecord: NotificationRecord): Promise<GithubEma
     let body = messageContents.Body!.toString();
     return await GithubEmailNotification.fromMailText(body);
 }
+
+/// Given a particular event, return the url to view it on github.
+export async function notificationViewUrl(
+    threadId: string,
+    notificationIndex: number,
+): Promise<string | undefined> {
+    console.log({
+        level: "debug",
+        threadId,
+        notificationIndex,
+    });
+
+    let response = await ddb.get({
+        TableName: notificationsDbTableName,
+        Key: { threadId, notificationIndex }
+    }).promise();
+
+    console.log({
+        level: "debug",
+        response: JSON.stringify(response, undefined, 2),
+    });
+
+    let notification = await loadNotification(response.Item! as NotificationRecord);
+    return notification.linkData?.viewAction?.url;
+}
