@@ -1,7 +1,7 @@
 import * as λ from 'aws-lambda';
 import { AppSyncResolverHandler } from 'aws-lambda';
 import * as γ from './generated/graphql';
-import { fetch_notifications } from './notifications';
+import { fetchNotificationsInDb } from './notifications';
 
 export { appsync_notifications_event };
 
@@ -12,5 +12,5 @@ async function appsync_notifications_event(event: AppSyncResolverHandler<γ.Quer
     });
 
     let { startNotificationIndex, endNotificationIndex, threadId }: γ.QueryGetNotificationsArgs = event.arguments;
-    return await fetch_notifications(threadId, startNotificationIndex, endNotificationIndex);
+    return await fetchNotificationsInDb(threadId, startNotificationIndex, endNotificationIndex);
 }

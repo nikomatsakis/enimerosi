@@ -53,6 +53,11 @@ type Thread {
     numNotifications: Int!
 
     """
+    If present, notifications up to this point are considered 'viewed'
+    """
+    lastViewed: Int
+
+    """
     If present, index of the last comment by this user
     """
     lastCommented: Int

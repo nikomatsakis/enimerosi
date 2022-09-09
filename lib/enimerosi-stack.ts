@@ -141,7 +141,7 @@ export class EnimerosiStack extends Stack {
       "notificationsDb": notificationsDb.tableName,
     });
     emailsBucket.grantRead(lambda);
-    threadDb.grantReadData(lambda);
+    threadDb.grantReadWriteData(lambda);
     notificationsDb.grantReadData(lambda);
 
     const api = new apigateway.RestApi(this, 'enimerosi-api', {
@@ -174,6 +174,10 @@ export class EnimerosiStack extends Stack {
     api.root.addResource('view').addResource('{thread}')
       .addResource("{index}")
       .addMethod('GET', lambdaIntegration);
+
+    // POST /updateLastViewed/{thread}
+    api.root.addResource('updateLastViewed').addResource('{thread}')
+      .addMethod('POST', lambdaIntegration);
   }
 }
 

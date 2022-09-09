@@ -13,6 +13,12 @@ export interface ThreadRecord {
     /// Begins at 0, incremented by 1 for each new notification we receive.
     numNotifications: NotificationIndex;
 
+    /// If set, equal to the number of notifications when this thread was last viewed
+    /// (i.e., clicked on). If this is equal to `numNotifications`, then there have not
+    /// been any new events. If this is set to `N`, then any event index `I >= N` has not yet
+    /// been viewed.
+    lastViewed: NotificationIndex;
+
     /// If set, equal to the highest index of a comment authored by me.
     lastCommented?: NotificationIndex;
 

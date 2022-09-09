@@ -9,7 +9,7 @@ const ddb = new DynamoDB.DocumentClient();
 const threadDbTableName: string = process.env.threadDb!;
 const notificationsDbTableName: string = process.env.notificationsDb!;
 
-export async function fetch_notifications(
+export async function fetchNotificationsInDb(
     threadId: string,
     startNotificationIndex: number,
     endNotificationIndex: number,
@@ -70,7 +70,7 @@ async function loadNotification(dbRecord: NotificationRecord): Promise<GithubEma
 }
 
 /// Given a particular event, return the url to view it on github.
-export async function notificationViewUrl(
+export async function getNotificationViewUrlInDb(
     threadId: string,
     notificationIndex: number,
 ): Promise<string | undefined> {

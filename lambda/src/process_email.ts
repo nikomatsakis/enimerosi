@@ -1,7 +1,7 @@
 import { Context, S3Event } from 'aws-lambda';
 import { S3, DynamoDB, AppSync } from 'aws-sdk';
 import { GithubEmailNotification, ThreadRecord, updateThreadRecord, NotificationRecord, tokenize } from 'enimerosi-ts-lib/src'; // "/src"??
-import { getThreadData } from "./threads";
+import { getThreadDataInDb } from "./threads";
 export { process_email_event };
 
 const ddb = new DynamoDB.DocumentClient();
@@ -38,7 +38,7 @@ async function process_email_event(event: S3Event, context: Context): Promise<an
             });
             let counter = 0;
             while (true) {
-                let dbThread = await getThreadData(notification.threadId.idString);
+                let dbThread = await getThreadDataInDb(notification.threadId.idString);
                 let newDbThread = updateThreadRecord(dbThread, notification);
                 let newDbNotification: NotificationRecord = {
                     threadId: notification.threadId.idString,
@@ -147,8 +147,8 @@ export async function tryStoreDbThreadAndNotification(token: string, oldDbThread
 
     appsync.makeRequest(
         `mutation MyMutation { updateThread(threadId: "foo") }`,
+    );
 
-    )
     return true;
 }
 

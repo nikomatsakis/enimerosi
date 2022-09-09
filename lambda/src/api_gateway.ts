@@ -1,9 +1,8 @@
 import * as λ from 'aws-lambda';
 import { APIGatewayEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
 import { S3, DynamoDB } from 'aws-sdk';
-import { GithubEmailNotification, NotificationRecord } from 'enimerosi-ts-lib/src';
-import { fetch_notifications, notificationViewUrl } from './notifications';
-import { allThreads, getThreadData } from './threads';
+import { fetchNotificationsInDb, getNotificationViewUrlInDb } from './notifications';
+import { getAllThreadsInDb, getThreadDataInDb, updateLastViewedInDb } from './threads';
 
 export { api_gateway_event };
 
@@ -27,6 +26,7 @@ async function api_gateway_event(
         case "/thread/{thread}": return getThread(event, context);
         case "/notifications/{thread}/{start}/{end}": return getNotifications(event, context);
         case "/view/{thread}/{index}": return viewNotification(event, context);
+        case "/updateLastViewed/{thread}": return updateLastViewed(event, context);
         default: throw new Error(`unrecognized resource ${event.resource}`);
     }
 }
@@ -44,7 +44,7 @@ async function getThreads(
         ? undefined
         : event.pathParameters.startKey);
 
-    let responseBody = await allThreads(startKey);
+    let responseBody = await getAllThreadsInDb(startKey);
 
     console.log({
         level: "debug",
@@ -68,7 +68,7 @@ async function getThread(
     let parameters = <ThreadParameters><any>event.pathParameters;
     let thread = decodeURIComponent(parameters.thread);
 
-    let responseBody = await getThreadData(thread);
+    let responseBody = await getThreadDataInDb(thread);
 
     return {
         statusCode: 200,
@@ -90,7 +90,7 @@ async function getNotifications(
     let thread = decodeURIComponent(parameters.thread);
     let start = Number.parseInt(parameters.start);
     let end = Number.parseInt(parameters.end);
-    let notifications = await fetch_notifications(thread, start, end);
+    let notifications = await fetchNotificationsInDb(thread, start, end);
 
     return {
         statusCode: 200,
@@ -110,7 +110,7 @@ async function viewNotification(
     let parameters: Parameters = <any>event.pathParameters;
     let thread = decodeURIComponent(parameters.thread);
     let index = Number.parseInt(parameters.index);
-    let url = await notificationViewUrl(thread, index);
+    let url = await getNotificationViewUrlInDb(thread, index);
     if (url === undefined) {
         throw new Error("no link data for that notification");
     }
@@ -120,5 +120,22 @@ async function viewNotification(
             location: url,
         },
         body: `<body>Redirecting to <a href="${url}">${thread}</a></body>`
+    };
+}
+
+async function updateLastViewed(
+    event: APIGatewayEvent,
+    context: Context
+): Promise<APIGatewayProxyResult> {
+    interface Parameters {
+        thread: string,
+    }
+
+    let parameters: Parameters = <any>event.pathParameters;
+    let thread = decodeURIComponent(parameters.thread);
+    await updateLastViewedInDb(thread);
+    return {
+        statusCode: 200,
+        body: JSON.stringify({}),
     };
 }

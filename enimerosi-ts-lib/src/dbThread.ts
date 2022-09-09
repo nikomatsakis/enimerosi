@@ -35,6 +35,13 @@ export function updateThreadRecord(oldThreadRecord: db.ThreadRecord | undefined,
     return newThreadRecord;
 }
 
+/// Update the `lastViewed` field to be `lastViewed`.
+export function updateThreadRecordLastViewed(oldThreadRecord: db.ThreadRecord): db.ThreadRecord {
+    let newThreadRecord = cloneThreadRecord(oldThreadRecord);
+    newThreadRecord.lastViewed = oldThreadRecord.numNotifications;
+    return newThreadRecord;
+}
+
 function cloneThreadRecord(threadRecord: db.ThreadRecord): db.ThreadRecord {
     return JSON.parse(JSON.stringify(threadRecord));
 }
@@ -50,6 +57,7 @@ function updateThreadRecordWithMyNotification(notification: GithubNotification, 
 
     // Update the record of when I last commented.
     newThreadRecord.lastCommented = notificationIndex;
+    newThreadRecord.lastViewed = notificationIndex;
 }
 
 /// Update the thread record with a message from someone else.
@@ -84,6 +92,7 @@ function createNewThreadRecord(notification: GithubNotification): db.ThreadRecor
     return {
         threadId: notification.threadId.idString,
         numNotifications: 0,
+        lastViewed: 0,
         mentionedByMe: [],
         subject: notification.subject,
     };
